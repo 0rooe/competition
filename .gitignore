@@ -43,3 +43,6 @@ yarn.lock
 ### System ###
 .DS_Store
 Thumbs.db
+
+### Docker & Database ###
+db_data

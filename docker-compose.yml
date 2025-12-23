@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  # 数据库服务
+  db:
+    image: mysql:5.7
+    container_name: competition-db
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: springbootpx13e
+      TZ: Asia/Shanghai
+    ports:
+      - "33306:3306" # 外部访问用 33306，内部应用连接依然用 3306
+    volumes:
+      - ./db_data:/var/lib/mysql
+      - ./db:/docker-entrypoint-initdb.d
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    networks:
+      - competition-net
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  # 应用服务
+  app:
+    build: .
+    container_name: competition-app
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - competition-net
+
+networks:
+  competition-net:
+    driver: bridge
