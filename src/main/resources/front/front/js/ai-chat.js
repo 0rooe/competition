@@ -1,4 +1,4 @@
-(function() {
+(function () {
     // 1. Inject HTML for the chat widget
     const chatWidgetHTML = `
         <div id="ai-chat-widget-btn" class="ai-chat-widget-btn">
@@ -23,7 +23,7 @@
             </div>
         </div>
     `;
-    
+
     // Create a container and append to body
     const container = document.createElement('div');
     container.innerHTML = chatWidgetHTML;
@@ -57,7 +57,7 @@
         // Add User Message
         appendMessage('user', text);
         chatInput.value = '';
-        
+
         // Disable input while waiting
         disableInput(true);
 
@@ -70,12 +70,8 @@
             // Need to adjust the path based on actual deployment context path if needed
             // Based on index.html: context-path is /springbootpx13e ? No, usually simple relative path works if same origin.
             // Let's try relative path '../ai/chat' or '/springbootpx13e/ai/chat'
-            // The index.html is in /front/front/, so relative to root is ../../
-            // But we are in frontend static resources served by Spring. 
-            // If the page is http://localhost:8080/springbootpx13e/front/front/index.html
-            // Then API is http://localhost:8080/springbootpx13e/ai/chat
-            
-            const response = await fetch('../../ai/chat', {
+            // Use absolute path with context root
+            const response = await fetch('/springbootpx13e/ai/chat', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -84,13 +80,13 @@
             });
 
             const data = await response.json();
-            
+
             removeLoading(loadingId);
-            
+
             if (data.code === 0) {
-                 appendMessage('ai', data.reply);
+                appendMessage('ai', data.reply);
             } else {
-                 appendMessage('ai', "抱歉，出错了：" + (data.msg || "未知错误"));
+                appendMessage('ai', "抱歉，出错了：" + (data.msg || "未知错误"));
             }
 
         } catch (error) {
@@ -142,7 +138,7 @@
     function scrollToBottom() {
         chatBody.scrollTop = chatBody.scrollHeight;
     }
-    
+
     function disableInput(disabled) {
         chatInput.disabled = disabled;
         sendBtn.disabled = disabled;
