@@ -1,260 +1,276 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-		<title>首页</title>
-		<link rel="stylesheet" href="./layui/css/layui.css">
-		<link rel="stylesheet" href="./xznstatic/css/common.css"/>
-		<link rel="stylesheet" href="./xznstatic/css/style.css"/>
-	</head>
-	<style type="text/css">
-		[v-cloak] {
-			display: none;
-		}
-		html, body {
-			height: 100%;
-			background-color: #f6f8fa;
-		}
-		#iframe {
-			width: 100%;
-			margin-top: 80px; /* Reduced top margin */
-			padding-top: 0;
-            min-height: calc(100vh - 80px);
-		}
-		#header {
-			height: 80px;
-			background: #fff;
-			border-bottom: 1px solid #eee;
-			position: fixed;
-			top: 0;
-			left: 0;
-			width: 100%;
-			z-index: 1000;
-			box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-			display: flex;
-			align-items: center;
-			justify-content: space-between;
-			padding: 0 40px;
-            box-sizing: border-box;
-		}
 
-		/* Brand / Title Area */
-		#header .brand {
-			display: flex;
-			align-items: center;
-            height: 100%;
-		}
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<title>首页</title>
+	<link rel="stylesheet" href="./layui/css/layui.css">
+	<link rel="stylesheet" href="./xznstatic/css/common.css" />
+	<link rel="stylesheet" href="./xznstatic/css/style.css" />
+</head>
+<style type="text/css">
+	[v-cloak] {
+		display: none;
+	}
 
-		#header .brand .title {
-			font-size: 24px;
-			font-weight: 600;
-			color: #1E9FFF; /* Theme Blue */
-			margin-right: 20px;
-            letter-spacing: 1px;
-		}
-        
-        #header .brand .subtitle {
-            font-size: 14px;
-            color: #666;
-            margin-top: 4px;
-            padding-left: 20px;
-            border-left: 1px solid #ddd;
-            height: 20px;
-            line-height: 20px;
-        }
+	html,
+	body {
+		height: 100%;
+		background-color: #f6f8fa;
+	}
 
-		/* Navigation Area */
-		#header .navs {
-			display: flex;
-            height: 100%;
-            align-items: center;
-		}
-        
-		#header .navs ul {
-            display: flex;
-            height: 100%;
-            align-items: center;
-        }
+	#iframe {
+		width: 100%;
+		margin-top: 80px;
+		/* Reduced top margin */
+		padding-top: 0;
+		min-height: calc(100vh - 80px);
+	}
 
-		#header .navs li {
-			display: inline-block;
-            height: 100%;
-            display: flex;
-            align-items: center;
-			padding: 0 20px;
-			cursor: pointer;
-            transition: all 0.3s;
-            position: relative;
-		}
-        
-		#header .navs li a {
-			font-size: 16px;
-			color: #333;
-            text-decoration: none;
-            display: block;
-            width: 100%;
-            text-align: center;
-		}
+	#header {
+		height: 80px;
+		background: #fff;
+		border-bottom: 1px solid #eee;
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		z-index: 1000;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 0 40px;
+		box-sizing: border-box;
+	}
 
-		/* Hover & Active States */
-		#header .navs li:hover, 
-        #header .navs li.current {
-            background-color: rgba(30, 159, 255, 0.05);
-		}
-        
-        #header .navs li:hover a,
-        #header .navs li.current a {
-            color: #1E9FFF;
-            font-weight: 500;
-        }
-        
-        #header .navs li.current::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 3px;
-            background-color: #1E9FFF;
-        }
+	/* Brand / Title Area */
+	#header .brand {
+		display: flex;
+		align-items: center;
+		height: 100%;
+	}
 
-        /* Iframe scroll adjustment */
-        ::-webkit-scrollbar {
-            width: 10px;
-            height: 10px;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #ccc;
-            border-radius: 5px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-	</style>
-	<body>
-		<!-- Top Navigation Bar -->
-		<div id="header" v-cloak>
-			<div class="brand">
-                <div class="title" v-text="projectName"></div>
-                <div class="subtitle">欢迎访问学科竞赛管理系统</div>
-			</div>
-		    <div class="navs">
-				<div class="list">
-					<ul>
-                        <!-- Native Vue click handling, removed jQuery dependency for logic -->
-						<li :class="{current: activeIndex === -1}" @click="navPage('./pages/home/home.html', -1)">
-                            <a href="javascript:;">首页</a>
-                        </li>
-						<li v-for="(item,index) in indexNav" :key="index" :class="{current: activeIndex === index}" @click="navPage(item.url, index)">
-                            <a href="javascript:;">{{item.name}}</a>
-                        </li>
-						<li @click="centerPage()">
-                            <a href="javascript:;">个人中心</a>
-                        </li>
-						<li>
-                            <a :href="adminurl" target="_blank">后台管理</a>
-                        </li>
-						<li v-if="cartFlag" @click="navPage('./pages/shop-cart/list.html', 99)">
-                            <a href="javascript:;">购物车</a>
-                        </li>
-						<li v-if="chatFlag" @click="chatTap()">
-                            <a href="javascript:;">客服</a>
-                        </li>
-					</ul>
-				</div>
-		    </div>
+	#header .brand .title {
+		font-size: 24px;
+		font-weight: 600;
+		color: #1E9FFF;
+		/* Theme Blue */
+		margin-right: 20px;
+		letter-spacing: 1px;
+	}
+
+	#header .brand .subtitle {
+		font-size: 14px;
+		color: #666;
+		margin-top: 4px;
+		padding-left: 20px;
+		border-left: 1px solid #ddd;
+		height: 20px;
+		line-height: 20px;
+	}
+
+	/* Navigation Area */
+	#header .navs {
+		display: flex;
+		height: 100%;
+		align-items: center;
+	}
+
+	#header .navs ul {
+		display: flex;
+		height: 100%;
+		align-items: center;
+	}
+
+	#header .navs li {
+		display: inline-block;
+		height: 100%;
+		display: flex;
+		align-items: center;
+		padding: 0 20px;
+		cursor: pointer;
+		transition: all 0.3s;
+		position: relative;
+	}
+
+	#header .navs li a {
+		font-size: 16px;
+		color: #333;
+		text-decoration: none;
+		display: block;
+		width: 100%;
+		text-align: center;
+	}
+
+	/* Hover & Active States */
+	#header .navs li:hover,
+	#header .navs li.current {
+		background-color: rgba(30, 159, 255, 0.05);
+	}
+
+	#header .navs li:hover a,
+	#header .navs li.current a {
+		color: #1E9FFF;
+		font-weight: 500;
+	}
+
+	#header .navs li.current::after {
+		content: '';
+		position: absolute;
+		bottom: 0;
+		left: 0;
+		width: 100%;
+		height: 3px;
+		background-color: #1E9FFF;
+	}
+
+	/* Iframe scroll adjustment */
+	::-webkit-scrollbar {
+		width: 10px;
+		height: 10px;
+	}
+
+	::-webkit-scrollbar-thumb {
+		background: #ccc;
+		border-radius: 5px;
+	}
+
+	::-webkit-scrollbar-track {
+		background: #f1f1f1;
+	}
+</style>
+
+<body>
+	<!-- Top Navigation Bar -->
+	<div id="header" v-cloak>
+		<div class="brand">
+			<div class="title" v-text="projectName"></div>
+			<div class="subtitle">欢迎访问学科竞赛管理系统</div>
 		</div>
+		<div class="navs">
+			<div class="list">
+				<ul>
+					<!-- Native Vue click handling, removed jQuery dependency for logic -->
+					<li :class="{current: activeIndex === -1}" @click="navPage('./pages/home/home.html', -1)">
+						<a href="javascript:;">首页</a>
+					</li>
+					<li v-for="(item,index) in indexNav" :key="index" :class="{current: activeIndex === index}"
+						@click="navPage(item.url, index)">
+						<a href="javascript:;">{{item.name}}</a>
+					</li>
+					<li @click="centerPage()">
+						<a href="javascript:;">个人中心</a>
+					</li>
+					<li>
+						<a :href="adminurl" target="_blank">后台管理</a>
+					</li>
+					<li v-if="cartFlag" @click="navPage('./pages/shop-cart/list.html', 99)">
+						<a href="javascript:;">购物车</a>
+					</li>
+					<li v-if="chatFlag" @click="chatTap()">
+						<a href="javascript:;">客服</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
 
-		<iframe src="./pages/home/home.html" id="iframe" frameborder="0" scrolling="auto" width="100%" onload="changeFrameHeight()"></iframe>
+	<iframe src="./pages/home/home.html" id="iframe" frameborder="0" scrolling="auto" width="100%"
+		onload="changeFrameHeight()"></iframe>
 
-        <!-- Simplified Footer -->
-<!--    <div id="tabbar" class="tabbar" style="background: #333; color: #999; padding: 30px 0; text-align: center; font-size: 14px;">-->
-<!--      <div class="desc">联系电话：400-800-0000 | 咨询邮箱：support@competition.com</div>-->
-<!--      <div style="margin-top: 10px;">&copy; 2024 学科竞赛管理系统 版权所有</div>-->
-<!--    </div>-->
+	<!-- Simplified Footer -->
+	<!--    <div id="tabbar" class="tabbar" style="background: #333; color: #999; padding: 30px 0; text-align: center; font-size: 14px;">-->
+	<!--      <div class="desc">联系电话：400-800-0000 | 咨询邮箱：support@competition.com</div>-->
+	<!--      <div style="margin-top: 10px;">&copy; 2024 学科竞赛管理系统 版权所有</div>-->
+	<!--    </div>-->
 
-		<script src="./xznstatic/js/jquery-1.11.3.min.js"></script>
-		<script src="./layui/layui.js"></script>
-		<script src="./js/vue.js"></script>
-		<script src="./js/config.js"></script>
+	<script src="./xznstatic/js/jquery-1.11.3.min.js"></script>
+	<script src="./layui/layui.js"></script>
+	<script src="./js/vue.js"></script>
+	<script src="./js/config.js"></script>
+	<!-- AI Chat Widget -->
+	<link rel="stylesheet" href="./css/ai-chat.css" />
+	<script src="./js/ai-chat.js"></script>
 
-		<script>
-            // var vue1 = new Vue({el: '#tabbar'})
+	<script>
+		// var vue1 = new Vue({el: '#tabbar'})
 
-			var vue = new Vue({
-				el: '#header',
-				data: {
-					indexNav: indexNav,
-					cartFlag: cartFlag,
-					adminurl: adminurl,
-					chatFlag: chatFlag,
-					projectName: projectName,
-                    activeIndex: -1 // State for active menu item
+		var vue = new Vue({
+			el: '#header',
+			data: {
+				indexNav: indexNav,
+				cartFlag: cartFlag,
+				adminurl: adminurl,
+				chatFlag: chatFlag,
+				projectName: projectName,
+				activeIndex: -1 // State for active menu item
+			},
+			methods: {
+				// Unified navigation function
+				navPage(url, index) {
+					this.activeIndex = index;
+					// Avoid iframe reload if same URL (Optional, but good for UX)
+					var iframe = document.getElementById('iframe');
+					localStorage.setItem('iframeUrl', url);
+					iframe.src = url;
 				},
-				methods: {
-					// Unified navigation function
-					navPage(url, index) {
-                        this.activeIndex = index;
-                        // Avoid iframe reload if same URL (Optional, but good for UX)
-                        var iframe = document.getElementById('iframe');
-						localStorage.setItem('iframeUrl', url);
-						iframe.src = url;
-					},
-                    centerPage() {
-                        var userTable = localStorage.getItem('userTable');
-                        if (userTable) {
-                            this.navPage('./pages/' + userTable + '/center.html', -2); // -2 for Center
-                        } else {
-                            window.location.href = './pages/login/login.html'
-                        }
-                    },
-                    chatTap(){
-                        var userTable = localStorage.getItem('userTable');
-                        if (userTable) {
-                            layui.layer.open({
-                                type: 2, title: '客服', area: ['600px', '600px'],
-                                content: './pages/chat/chat.html'
-                            });
-                        } else {
-                            window.location.href = './pages/login/login.html'
-                        }
-                    }
+				centerPage() {
+					var userTable = localStorage.getItem('userTable');
+					if (userTable) {
+						this.navPage('./pages/' + userTable + '/center.html', -2); // -2 for Center
+					} else {
+						window.location.href = './pages/login/login.html'
+					}
+				},
+				chatTap() {
+					var userTable = localStorage.getItem('userTable');
+					if (userTable) {
+						layui.layer.open({
+							type: 2, title: '客服', area: ['600px', '600px'],
+							content: './pages/chat/chat.html'
+						});
+					} else {
+						window.location.href = './pages/login/login.html'
+					}
 				}
-			});
-
-			layui.use(['element','layer'], function() {
-				var element = layui.element;
-				var layer = layui.layer;
-			});
-
-			// Restore state on page reload
-			var iframeUrl = localStorage.getItem('iframeUrl');
-			document.getElementById('iframe').src = iframeUrl  || './pages/home/home.html';
-            
-            // Simple auto-height (if needed, though flex/100vh usually handles it better for fullscreen apps)
-            function changeFrameHeight() {
-                var iframe = document.getElementById('iframe');
-                if (iframe) {
-                     // Reset height to allow shrinking
-                    iframe.style.height = 'calc(100vh - 80px)';
-                    // If content is larger, expand. Warning: Cross-origin restriction might block this for external links.
-                    try {
-                        var iframeWin = iframe.contentWindow || iframe.contentDocument.parentWindow;
-                        if (iframeWin.document.body) {
-                           var newHeight = iframeWin.document.body.scrollHeight;
-                           // Only expand if content is taller than viewport
-                           if(newHeight > document.documentElement.clientHeight - 80) {
-                               iframe.style.height = newHeight + 'px';
-                           }
-                        }
-                    } catch(e) {}
-                }
-            }
-
-			window.onresize = function() {
-				changeFrameHeight();
 			}
-		</script>
-	</body>
+		});
+
+		layui.use(['element', 'layer'], function () {
+			var element = layui.element;
+			var layer = layui.layer;
+		});
+
+		// Restore state on page reload
+		var iframeUrl = localStorage.getItem('iframeUrl');
+		document.getElementById('iframe').src = iframeUrl || './pages/home/home.html';
+
+		// Simple auto-height (if needed, though flex/100vh usually handles it better for fullscreen apps)
+		function changeFrameHeight() {
+			var iframe = document.getElementById('iframe');
+			if (iframe) {
+				// Reset height to allow shrinking
+				iframe.style.height = 'calc(100vh - 80px)';
+				// If content is larger, expand. Warning: Cross-origin restriction might block this for external links.
+				try {
+					var iframeWin = iframe.contentWindow || iframe.contentDocument.parentWindow;
+					if (iframeWin.document.body) {
+						var newHeight = iframeWin.document.body.scrollHeight;
+						// Only expand if content is taller than viewport
+						if (newHeight > document.documentElement.clientHeight - 80) {
+							iframe.style.height = newHeight + 'px';
+						}
+					}
+				} catch (e) { }
+			}
+		}
+
+		window.onresize = function () {
+			changeFrameHeight();
+		}
+	</script>
+</body>
+
 </html>
