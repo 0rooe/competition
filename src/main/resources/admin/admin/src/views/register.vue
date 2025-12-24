@@ -2,7 +2,7 @@
   <div>
     <div class="container">
       <div class="login-form" style="backgroundColor:rgba(255, 250, 250, 0.57);borderRadius:10px">
-        <h1 class="h1" style="color:rgba(81, 163, 81, 1);fontSize:28px;">学科竞赛管理系统注册</h1>
+        <h1 class="h1" style="color:#409EFF;fontSize:28px;">学科竞赛管理系统注册</h1>
 		<el-form ref="rgsForm" class="rgs-form" :model="rgsForm" label-width="120px">
 															<!-- <div v-if="tableName=='xuesheng'" class="input-group">
 			   <div class="label">学号</div>
@@ -218,30 +218,30 @@ export default {
 </script>
 <style lang="scss" scoped>
 	.el-radio__input.is-checked .el-radio__inner {
-		border-color: #00c292;
-		background: #00c292;
+		border-color: #409EFF;
+		background: #409EFF;
 	}
 
 	.el-radio__input.is-checked .el-radio__inner {
-		border-color: #00c292;
-		background: #00c292;
+		border-color: #409EFF;
+		background: #409EFF;
 	}
 
 	.el-radio__input.is-checked .el-radio__inner {
-		border-color: #00c292;
-		background: #00c292;
+		border-color: #409EFF;
+		background: #409EFF;
 	}
 
 	.el-radio__input.is-checked+.el-radio__label {
-		color: #00c292;
+		color: #409EFF;
 	}
 
 	.el-radio__input.is-checked+.el-radio__label {
-		color: #00c292;
+		color: #409EFF;
 	}
 
 	.el-radio__input.is-checked+.el-radio__label {
-		color: #00c292;
+		color: #409EFF;
 	}
 
 	.h1 {
@@ -256,7 +256,7 @@ export default {
 	// .container {
  //    min-height: 100vh;
  //    text-align: center;
- //    // background-color: #00c292;
+ //    // background-color: #409EFF;
  //    padding-top: 20vh;
  //    background-image: url(../assets/img/bg.jpg);
  //    background-size: 100% 100%;
@@ -438,7 +438,7 @@ export default {
 					border-style: solid;
 					border-color: #409EFF;
 					border-radius: 4px;
-					background-color: rgba(81, 163, 81, 1);
+					background-color: #409EFF;
 				}
 
 				.close {

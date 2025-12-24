@@ -49,3 +49,6 @@ db_data/
 upload/
 logs/
 *.jar
+
+*.zip
+*.7z

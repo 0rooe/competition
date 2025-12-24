@@ -1,5 +1,5 @@
 <template>
-  <el-breadcrumb class="app-breadcrumb" separator="❤" style="height:50px;backgroundColor:rgba(255, 255, 255, 1);borderRadius:4px;padding:0px 0px 0px 20px;boxShadow:0px 0px 0px #f903d4;borderWidth:2px;borderStyle:dotted solid double dashed;borderColor:rgba(255, 255, 255, 1);">
+  <el-breadcrumb class="app-breadcrumb" separator=">" style="height:50px;backgroundColor:rgba(255, 255, 255, 1);borderRadius:4px;padding:0px 0px 0px 20px;boxShadow:0px 0px 0px #f903d4;borderWidth:2px;borderStyle:dotted solid double dashed;borderColor:rgba(255, 255, 255, 1);">
     <transition-group name="breadcrumb" class="box" :style="1==1?'justifyContent:flex-start;':1==2?'justifyContent:center;':'justifyContent:flex-end;'">
       <el-breadcrumb-item v-for="(item,index) in levelList" :key="item.path">
         <span v-if="item.redirect==='noRedirect'||index==levelList.length-1" class="no-redirect">{{ item.name }}</span>
@@ -62,14 +62,14 @@ export default {
     breadcrumbStyleChange(val) {
       this.$nextTick(()=>{
         document.querySelectorAll('.app-breadcrumb .el-breadcrumb__separator').forEach(el=>{
-          el.innerText = "❤"
-          el.style.color = "rgba(254, 0, 8, 1)"
+          el.innerText = ">"
+          el.style.color = "#C0C4CC"
         })
         document.querySelectorAll('.app-breadcrumb .el-breadcrumb__inner a').forEach(el=>{
           el.style.color = "#303133"
         })
         document.querySelectorAll('.app-breadcrumb .el-breadcrumb__inner .no-redirect').forEach(el=>{
-          el.style.color = "rgba(81, 163, 81, 1)"
+          el.style.color = "#409EFF"
         })
 
         let str = "horizontal"

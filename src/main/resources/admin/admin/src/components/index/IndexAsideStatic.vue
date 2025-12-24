@@ -5,7 +5,7 @@
         <div class="menulistImg" style="backgroundColor:#ff0000;padding:25px 0" v-if="false && menulistStyle == 'vertical'">
           <el-image v-if="'http://codegen.caihongy.cn/20201021/cc7d45d9c8164b58b18351764eba9be1.jpg'" src="http://codegen.caihongy.cn/20201021/cc7d45d9c8164b58b18351764eba9be1.jpg" fit="cover" />
         </div>
-        <el-menu mode="horizontal" :unique-opened="true" class="el-menu-demo" style="height:100%;" background-color="#F5F5F5" text-color="#080808" active-text-color="#000000" default-active="0">
+        <el-menu mode="horizontal" :unique-opened="true" class="el-menu-demo" style="height:100%;" background-color="#FFFFFF" text-color="#333333" active-text-color="#409EFF" default-active="0">
           <el-menu-item index="0" :style="menulistBorderBottom" @click="menuHandler('')"><i v-if="true" class="el-icon-s-home" />首页</el-menu-item>
           <el-submenu :index="1+''" :style="menulistBorderBottom">
             <template slot="title">
@@ -125,27 +125,27 @@ export default {
       let that = this
       this.$nextTick(()=>{
         document.querySelectorAll('.menulist .el-menu-item').forEach(el=>{
-          el.addEventListener("mouseenter", e => {
+            el.addEventListener("mouseenter", e => {
             e.stopPropagation()
-            el.style.backgroundColor = "rgba(81, 163, 81, 1)"
+            el.style.backgroundColor = "rgba(64, 158, 255, 0.1)"
           })
           el.addEventListener("mouseleave", e => {
             e.stopPropagation()
-            el.style.backgroundColor = "#F5F5F5"
+            el.style.backgroundColor = "#FFFFFF"
           })
           el.addEventListener("focus", e => {
             e.stopPropagation()
-            el.style.backgroundColor = "rgba(81, 163, 81, 1)"
+            el.style.backgroundColor = "rgba(64, 158, 255, 0.1)"
           })
         })
         document.querySelectorAll('.menulist .el-submenu__title').forEach(el=>{
           el.addEventListener("mouseenter", e => {
             e.stopPropagation()
-            el.style.backgroundColor = "rgba(81, 163, 81, 1)"
+            el.style.backgroundColor = "rgba(64, 158, 255, 0.1)"
           })
           el.addEventListener("mouseleave", e => {
             e.stopPropagation()
-            el.style.backgroundColor = "#F5F5F5"
+            el.style.backgroundColor = "#FFFFFF"
           })
         })
       })
