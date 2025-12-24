@@ -45,4 +45,7 @@ yarn.lock
 Thumbs.db
 
 ### Docker & Database ###
-db_data
+db_data/
+upload/
+logs/
+*.jar

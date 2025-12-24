@@ -18,7 +18,7 @@ services:
     networks:
       - competition-net
     healthcheck:
-      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
       timeout: 20s
       retries: 10
 
@@ -28,6 +28,8 @@ services:
     container_name: competition-app
     ports:
       - "8080:8080"
+    volumes:
+      - ./upload:/app/upload
     depends_on:
       db:
         condition: service_healthy
