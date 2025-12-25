@@ -1,8 +1,8 @@
 <template>
   <div>
-    <div class="container loginIn" style="backgroundImage: url(http://codegen.caihongy.cn/20210309/e319ed1e30e045c783c4bc36d3dc4e55.jpg)">
+    <div class="container loginIn" style="background-image: linear-gradient(135deg, #ffffff 0%, #1E9FFF 100%);">
 
-      <div :class="2 == 1 ? 'left' : 2 == 2 ? 'left center' : 'left right'" style="backgroundColor: rgba(255, 255, 255, 0.29)">
+      <div :class="2 == 1 ? 'left' : 2 == 2 ? 'left center' : 'left right'" style="background-color: rgba(255, 255, 255, 0.9); box-shadow: 0 0 20px rgba(0,0,0,0.1);">
         <el-form class="login-form" label-position="left" :label-width="1 == 3 ? '56px' : '0px'">
           <div class="title-container"><h3 class="title" style="color: rgba(64, 158, 255, 1)">学科竞赛管理系统登录</h3></div>
           <el-form-item :label="1 == 3 ? '用户名' : ''" :class="'style'+1">
@@ -102,7 +102,7 @@ export default {
         })
         setTimeout(()=>{
           document.querySelectorAll('.loginIn .role .el-radio__label').forEach(el=>{
-            el.style.color = "#fff"
+            el.style.color = "#333"
           })
         },350)
       })

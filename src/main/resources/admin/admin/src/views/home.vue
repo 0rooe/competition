@@ -1,80 +1,85 @@
 <template>
 <div class="content">
-  <!-- Statistics Cards -->
-  <el-row :gutter="20" style="width: 100%; margin-bottom: 20px;">
-    <el-col :span="6">
-      <el-card shadow="hover" :body-style="{ padding: '0px' }">
-        <div class="card-content">
-          <div class="icon-box" style="background-color: #409EFF">
-            <i class="el-icon-user-solid"></i>
+  <div v-if="role == '管理员'">
+    <!-- Statistics Cards -->
+    <el-row :gutter="20" style="width: 100%; margin-bottom: 20px;">
+      <el-col :span="6">
+        <el-card shadow="hover" :body-style="{ padding: '0px' }">
+          <div class="card-content">
+            <div class="icon-box" style="background-color: #409EFF">
+              <i class="el-icon-user-solid"></i>
+            </div>
+            <div class="text-box">
+              <div class="count">{{ xueshengCount }}</div>
+              <div class="label">学生总数</div>
+            </div>
           </div>
-          <div class="text-box">
-            <div class="count">{{ xueshengCount }}</div>
-            <div class="label">学生总数</div>
+        </el-card>
+      </el-col>
+      <el-col :span="6">
+        <el-card shadow="hover" :body-style="{ padding: '0px' }">
+          <div class="card-content">
+            <div class="icon-box" style="background-color: #67C23A">
+              <i class="el-icon-s-custom"></i>
+            </div>
+            <div class="text-box">
+              <div class="count">{{ jiaoshiCount }}</div>
+              <div class="label">教师总数</div>
+            </div>
           </div>
-        </div>
-      </el-card>
-    </el-col>
-    <el-col :span="6">
-      <el-card shadow="hover" :body-style="{ padding: '0px' }">
-        <div class="card-content">
-          <div class="icon-box" style="background-color: #67C23A">
-            <i class="el-icon-s-custom"></i>
+        </el-card>
+      </el-col>
+      <el-col :span="6">
+        <el-card shadow="hover" :body-style="{ padding: '0px' }">
+          <div class="card-content">
+            <div class="icon-box" style="background-color: #E6A23C">
+               <i class="el-icon-trophy"></i>
+            </div>
+            <div class="text-box">
+              <div class="count">{{ saixiangCount }}</div>
+              <div class="label">赛项总数</div>
+            </div>
           </div>
-          <div class="text-box">
-            <div class="count">{{ jiaoshiCount }}</div>
-            <div class="label">教师总数</div>
+        </el-card>
+      </el-col>
+      <el-col :span="6">
+        <el-card shadow="hover" :body-style="{ padding: '0px' }">
+          <div class="card-content">
+            <div class="icon-box" style="background-color: #F56C6C">
+              <i class="el-icon-edit-outline"></i>
+            </div>
+            <div class="text-box">
+              <div class="count">{{ baomingCount }}</div>
+              <div class="label">报名总数</div>
+            </div>
           </div>
-        </div>
-      </el-card>
-    </el-col>
-    <el-col :span="6">
-      <el-card shadow="hover" :body-style="{ padding: '0px' }">
-        <div class="card-content">
-          <div class="icon-box" style="background-color: #E6A23C">
-             <i class="el-icon-trophy"></i>
-          </div>
-          <div class="text-box">
-            <div class="count">{{ saixiangCount }}</div>
-            <div class="label">赛项总数</div>
-          </div>
-        </div>
-      </el-card>
-    </el-col>
-    <el-col :span="6">
-      <el-card shadow="hover" :body-style="{ padding: '0px' }">
-        <div class="card-content">
-          <div class="icon-box" style="background-color: #F56C6C">
-            <i class="el-icon-edit-outline"></i>
-          </div>
-          <div class="text-box">
-            <div class="count">{{ baomingCount }}</div>
-            <div class="label">报名总数</div>
-          </div>
-        </div>
-      </el-card>
-    </el-col>
-  </el-row>
+        </el-card>
+      </el-col>
+    </el-row>
 
-  <!-- Charts -->
-  <el-row :gutter="20" style="width: 100%;">
-    <el-col :span="12">
-      <el-card shadow="hover">
-        <div slot="header" class="clearfix">
-          <span>赛项类型分布</span>
-        </div>
-        <div id="typeChart" style="width: 100%; height: 400px;"></div>
-      </el-card>
-    </el-col>
-    <el-col :span="12">
-      <el-card shadow="hover">
-        <div slot="header" class="clearfix">
-          <span>赛项级别统计</span>
-        </div>
-        <div id="levelChart" style="width: 100%; height: 400px;"></div>
-      </el-card>
-    </el-col>
-  </el-row>
+    <!-- Charts -->
+    <el-row :gutter="20" style="width: 100%;">
+      <el-col :span="12">
+        <el-card shadow="hover">
+          <div slot="header" class="clearfix">
+            <span>赛项类型分布</span>
+          </div>
+          <div id="typeChart" style="width: 100%; height: 400px;"></div>
+        </el-card>
+      </el-col>
+      <el-col :span="12">
+        <el-card shadow="hover">
+          <div slot="header" class="clearfix">
+            <span>赛项级别统计</span>
+          </div>
+          <div id="levelChart" style="width: 100%; height: 400px;"></div>
+        </el-card>
+      </el-col>
+    </el-row>
+  </div>
+  <div v-else class="welcome-box">
+    <h2>欢迎使用学科竞赛管理系统</h2>
+  </div>
 </div>
 </template>
 <script>
@@ -89,12 +94,16 @@ export default {
       saixiangCount: 0,
       baomingCount: 0,
       typeChart: null,
-      levelChart: null
+      levelChart: null,
+      role: ''
     };
   },
   mounted(){
     this.init();
-    this.getAllData();
+    this.role = this.$storage.get('role');
+    if(this.role == '管理员') {
+      this.getAllData();
+    }
   },
   methods:{
     init(){
@@ -278,6 +287,23 @@ export default {
         font-size: 14px;
         color: #909399;
         margin-top: 10px;
+    }
+}
+
+.welcome-box {
+    width: 100%;
+    height: 500px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #fff;
+    border-radius: 4px;
+    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+
+    h2 {
+        font-size: 32px;
+        color: #409EFF;
+        font-weight: 600;
     }
 }
 </style>

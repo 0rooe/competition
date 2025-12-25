@@ -129,7 +129,7 @@
 
 			<div class="login-footer">
 				<span v-for="(item,index) in menu" :key="index" v-if="item.hasFrontRegister=='是'">
-					<a :href="'../'+item.tableName+'/register.html'">注册{{item.roleName}}</a>
+					<a :href="'../'+item.tableName+'/register.html?tablename='+item.tableName">注册{{item.roleName}}</a>
 				</span>
 			</div>
 		</form>
