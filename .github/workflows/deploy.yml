@@ -50,19 +50,6 @@ jobs:
           if [ -z "${SERVER_HOST}" ]; then echo "SERVER_HOST is empty!"; else echo "SERVER_HOST is set (length: ${#SERVER_HOST})"; fi
           if [ -z "${SERVER_USER}" ]; then echo "SERVER_USER is empty!"; else echo "SERVER_USER is set (length: ${#SERVER_USER})"; fi
         env:
-          SERVER_HOST: ${{ secrets.SERVER_HOST }}
-          SERVER_USER: ${{ secrets.SERVER_USER }}
-
-      - name: Copy files via SCP
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          password: ${{ secrets.SERVER_PASSWORD }}
-          source: "docker-compose-prod.yml,db/*"
-          target: "/opt/competition"
-          strip_components: 0
-
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.0.0
         with:
@@ -71,7 +58,6 @@ jobs:
           password: ${{ secrets.SERVER_PASSWORD }}
           script: |
             cd /opt/competition
-            mv docker-compose-prod.yml docker-compose.yml
             # 登录 Docker (确保有权限拉取镜像，虽然之前登录过，但为了保险可以再处理，或者依赖之前的手动登录)
             # 这里假设之前已经手动登录过了，或者配置了 config.json
             
