@@ -153,8 +153,8 @@
 				<div class="layui-form-item">
 					<label class="layui-form-label">报名日期</label>
 					<div class="layui-input-block">
-						<input type="text" name="baomingriqi" id="baomingriqi" autocomplete="off" class="layui-input"
-							placeholder="请选择日期">
+						<input type="text" name="baomingriqi" id="baomingriqi" autocomplete="off"
+							class="layui-input readonly-input" readonly>
 					</div>
 				</div>
 
@@ -168,7 +168,6 @@
 
 				<div class="layui-form-item" style="margin-top: 40px; text-align: center;">
 					<button class="layui-btn btn-submit" lay-submit lay-filter="*">提交报名</button>
-					<button type="reset" class="layui-btn layui-btn-primary btn-reset">重置</button>
 				</div>
 			</form>
 		</div>
@@ -195,6 +194,7 @@
 					xuehao: '',
 					xingming: '',
 				},
+				backupDetail: {}, // Add backup object
 				ro: {},
 			},
 			methods: {
@@ -202,13 +202,14 @@
 			}
 		});
 
-		layui.use(['layer', 'element', 'http', 'jquery', 'form', 'laydate', 'tinymce'], function () {
+		layui.use(['layer', 'element', 'http', 'jquery', 'form', 'laydate', 'tinymce', 'util'], function () {
 			var layer = layui.layer;
 			var http = layui.http;
 			var jquery = layui.jquery;
 			var form = layui.form;
 			var laydate = layui.laydate;
 			var tinymce = layui.tinymce;
+			var util = layui.util;
 
 			// Date Picker
 			laydate.render({
@@ -229,6 +230,9 @@
 				if (data.data) {
 					vue.detail.xuehao = data.data.xuehao;
 					vue.detail.xingming = data.data.xingming;
+					// Update backup when session data arrives
+					vue.backupDetail.xuehao = data.data.xuehao;
+					vue.backupDetail.xingming = data.data.xingming;
 				}
 			});
 
@@ -240,9 +244,9 @@
 					if (o == 'leixing') vue.detail.leixing = obj[o];
 					if (o == 'jibie') vue.detail.jibie = obj[o];
 					if (o == 'baomingfeiyong') vue.detail.baomingfeiyong = obj[o];
-					// Note: We don't overwrite baomingriqi from crossObj usually,
-					// unless it's an edit form. For 'add', we default to today.
 				}
+				// Backup the initialized data (including cross data)
+				vue.backupDetail = JSON.parse(JSON.stringify(vue.detail));
 			}
 
 			// Submit
@@ -257,7 +261,7 @@
 				data.userid = localStorage.getItem('userid');
 
 				http.requestJson('saixiangbaoming/add', 'post', data, function (res) {
-					layer.msg('报名成功！请前往个人中心查看', {
+					layer.msg('报名成功！请前往个人后台查看', {
 						time: 2000,
 						icon: 6
 					}, function () {

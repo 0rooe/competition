@@ -28,8 +28,11 @@ FROM maven:3.8-jdk-8 as backend-builder
 
 WORKDIR /app-backend
 
-# 1. 复制 pom.xml 并预下载依赖 (利用缓存)
-COPY pom.xml .
+# 1. 复制 pom.xml 和 settings.xml 并预下载依赖 (利用缓存)
+COPY pom.xml settings.xml ./
+# 将 settings.xml 移动到 maven 配置目录，覆盖默认配置
+RUN mv settings.xml /usr/share/maven/conf/settings.xml
+
 # 加上 -B 参数静默下载，减少日志输出
 RUN mvn -B dependency:go-offline
 
