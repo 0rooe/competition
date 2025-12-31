@@ -1,7 +1,7 @@
 //  菜单显示异常修改tinymce/skins/ui/oxide/skin.min.css:96 .tox-silver-sink的z-index值
 //  http://tinymce.ax-z.cn/   中文文档
 
-layui.define(['jquery'],function (exports) {
+layui.define(['jquery'], function (exports) {
     var $ = layui.$
 
     var modFile = layui.cache.modules['tinymce'];
@@ -16,19 +16,20 @@ layui.define(['jquery'],function (exports) {
 
     var settings = {
         base_url: modPath
-        , images_upload_url: '/rest/upload'//图片上传接口，可在option传入，也可在这里修改，option的值优先
+        , images_upload_url: '/springbootpx13e/file/upload'//图片上传接口，可在option传入，也可在这里修改，option的值优先
         , language: 'zh_CN'//语言，可在option传入，也可在这里修改，option的值优先
         , response: {//后台返回数据格式设置
             statusName: response.statusName || 'code'//返回状态字段
             , msgName: response.msgName || 'msg'//返回消息字段
-            , dataName: response.dataName || 'data'//返回的数据
+            , dataName: response.dataName || 'file'//返回的数据
             , statusCode: response.statusCode || {
                 ok: 0//数据正常
             }
         }
         , success: function (res, succFun, failFun) {//图片上传完成回调 根据自己需要修改
             if (res[this.response.statusName] == this.response.statusCode.ok) {
-                succFun(res[this.response.dataName]);
+                var url = '/springbootpx13e/upload/' + res[this.response.dataName];
+                succFun(url);
             } else {
                 failFun(res[this.response.msgName]);
             }
@@ -40,7 +41,7 @@ layui.define(['jquery'],function (exports) {
     var t = {};
 
     //初始化
-    t.render = function (option,callback) {
+    t.render = function (option, callback) {
 
         var admin = layui.admin || {}
 
@@ -68,13 +69,13 @@ layui.define(['jquery'],function (exports) {
 
         option.images_upload_url = option.images_upload_url ? option.images_upload_url : settings.images_upload_url;
 
-        option.images_upload_handler = option.images_upload_handler? option.images_upload_handler : function (blobInfo, succFun, failFun) {
+        option.images_upload_handler = option.images_upload_handler ? option.images_upload_handler : function (blobInfo, succFun, failFun) {
 
             var formData = new FormData();
 
             formData.append('target', 'edit');
 
-            formData.append('edit', blobInfo.blob());
+            formData.append('file', blobInfo.blob());
 
             var ajaxOpt = {
 
@@ -85,6 +86,10 @@ layui.define(['jquery'],function (exports) {
                 type: 'POST',
 
                 data: formData,
+
+                beforeSend: function (request) {
+                    request.setRequestHeader("Token", localStorage.getItem("Token"));
+                },
 
                 processData: false,
 
@@ -114,15 +119,15 @@ layui.define(['jquery'],function (exports) {
         }
 
         option.menu = option.menu ? option.menu : {
-            file: {title: '文件', items: 'newdocument | print preview fullscreen | wordcount'},
-            edit: {title: '编辑', items: 'undo redo | cut copy paste pastetext selectall | searchreplace'},
+            file: { title: '文件', items: 'newdocument | print preview fullscreen | wordcount' },
+            edit: { title: '编辑', items: 'undo redo | cut copy paste pastetext selectall | searchreplace' },
             format: {
                 title: '格式',
                 items: 'bold italic underline strikethrough superscript subscript | formats | forecolor backcolor | removeformat'
             },
-            table: {title: '表格', items: 'inserttable tableprops deletetable | cell row column'},
+            table: { title: '表格', items: 'inserttable tableprops deletetable | cell row column' },
         };
-        if(typeof tinymce == 'undefined'){
+        if (typeof tinymce == 'undefined') {
 
             $.ajax({//获取插件
                 url: option.base_url + '/tinymce.js',
@@ -136,17 +141,17 @@ layui.define(['jquery'],function (exports) {
 
         }
 
-        layui.sessionData('layui-tinymce',{
+        layui.sessionData('layui-tinymce', {
 
-            key:option.selector,
+            key: option.selector,
 
-            value:option
+            value: option
 
         })
 
         tinymce.init(option);
 
-        if(typeof callback == 'function'){
+        if (typeof callback == 'function') {
 
             callback.call(option)
 
@@ -160,13 +165,13 @@ layui.define(['jquery'],function (exports) {
     // 获取ID对应的编辑器对象
     t.get = (elem) => {
 
-        if(elem && /^#|\./.test(elem)){
+        if (elem && /^#|\./.test(elem)) {
 
             var id = elem.substr(1)
 
             var edit = tinymce.editors[id];
 
-            if(!edit){
+            if (!edit) {
 
                 return console.error("编辑器未加载")
 
@@ -182,7 +187,7 @@ layui.define(['jquery'],function (exports) {
     }
 
     //重载
-    t.reload = (option,callback) => {
+    t.reload = (option, callback) => {
         option = option || {}
 
         var edit = t.get(option.elem);
@@ -191,11 +196,11 @@ layui.define(['jquery'],function (exports) {
 
         edit.destroy()
 
-        $.extend(optionCache,option)
+        $.extend(optionCache, option)
 
         tinymce.init(optionCache)
 
-        if(typeof callback == 'function'){
+        if (typeof callback == 'function') {
 
             callback.call(optionCache)
 
