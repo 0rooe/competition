@@ -22,8 +22,8 @@
         </div>
       </el-col>
                                     <el-col :span="12">
-        <el-form-item class="select" v-if="type!='info'"  label="类型" prop="leixing">
-          <el-select v-model="ruleForm.leixing" placeholder="请选择类型">
+        <el-form-item class="select" v-if="type!='info'"  label="奖项等级" prop="leixing">
+          <el-select v-model="ruleForm.leixing" placeholder="请选择或输入奖项等级" filterable allow-create>
             <el-option
                 v-for="(item,index) in leixingOptions"
                 v-bind:key="index"
@@ -33,81 +33,37 @@
           </el-select>
         </el-form-item>
         <div v-else>
-          <el-form-item class="input" label="类型" prop="leixing">
+          <el-form-item class="input" label="奖项等级" prop="leixing">
 	      <el-input v-model="ruleForm.leixing"
-                placeholder="类型" readonly></el-input>
+                placeholder="奖项等级" readonly></el-input>
           </el-form-item>
         </div>
       </el-col>
                                     <el-col :span="12">
-        <el-form-item class="input" v-if="type!='info'"  label="数学" prop="shuxue">
-          <el-input v-model="ruleForm.shuxue" 
-              placeholder="数学" clearable  :readonly="ro.shuxue"></el-input>
+        <el-form-item class="input" v-if="type!='info'"  label="比赛名称" prop="jiangxiangmingcheng">
+           <el-autocomplete
+            class="inline-input"
+            v-model="ruleForm.jiangxiangmingcheng"
+            :fetch-suggestions="querySearchCompetition"
+            placeholder="请输入或选择比赛名称"
+            clearable
+          ></el-autocomplete>
         </el-form-item>
         <div v-else>
-          <el-form-item class="input" label="数学" prop="shuxue">
-              <el-input v-model="ruleForm.shuxue" 
-                placeholder="数学" readonly></el-input>
+          <el-form-item class="input" label="比赛名称" prop="jiangxiangmingcheng">
+              <el-input v-model="ruleForm.jiangxiangmingcheng" 
+                placeholder="比赛名称" readonly></el-input>
           </el-form-item>
         </div>
       </el-col>
                                     <el-col :span="12">
-        <el-form-item class="input" v-if="type!='info'"  label="物理" prop="wuli">
-          <el-input v-model="ruleForm.wuli" 
-              placeholder="物理" clearable  :readonly="ro.wuli"></el-input>
+        <el-form-item class="input" v-if="type!='info'" label="数量" prop="zongshu">
+             <el-input v-model="ruleForm.zongshu" placeholder="数量" clearable></el-input>
         </el-form-item>
         <div v-else>
-          <el-form-item class="input" label="物理" prop="wuli">
-              <el-input v-model="ruleForm.wuli" 
-                placeholder="物理" readonly></el-input>
-          </el-form-item>
-        </div>
-      </el-col>
-                                    <el-col :span="12">
-        <el-form-item class="input" v-if="type!='info'"  label="化学" prop="huaxue">
-          <el-input v-model="ruleForm.huaxue" 
-              placeholder="化学" clearable  :readonly="ro.huaxue"></el-input>
-        </el-form-item>
-        <div v-else>
-          <el-form-item class="input" label="化学" prop="huaxue">
-              <el-input v-model="ruleForm.huaxue" 
-                placeholder="化学" readonly></el-input>
-          </el-form-item>
-        </div>
-      </el-col>
-                                    <el-col :span="12">
-        <el-form-item class="input" v-if="type!='info'"  label="生物" prop="shengwu">
-          <el-input v-model="ruleForm.shengwu" 
-              placeholder="生物" clearable  :readonly="ro.shengwu"></el-input>
-        </el-form-item>
-        <div v-else>
-          <el-form-item class="input" label="生物" prop="shengwu">
-              <el-input v-model="ruleForm.shengwu" 
-                placeholder="生物" readonly></el-input>
-          </el-form-item>
-        </div>
-      </el-col>
-                                    <el-col :span="12">
-        <el-form-item class="input" v-if="type!='info'"  label="信息学" prop="xinxixue">
-          <el-input v-model="ruleForm.xinxixue" 
-              placeholder="信息学" clearable  :readonly="ro.xinxixue"></el-input>
-        </el-form-item>
-        <div v-else>
-          <el-form-item class="input" label="信息学" prop="xinxixue">
-              <el-input v-model="ruleForm.xinxixue" 
-                placeholder="信息学" readonly></el-input>
-          </el-form-item>
-        </div>
-      </el-col>
-                                    <el-col :span="12">
-        <el-form-item class="input" v-if="type!='info'" label="总数" prop="zongshu">
-            <el-input v-model="zongshu"
-                placeholder="总数" readonly></el-input>
-        </el-form-item>
-        <div v-else>
-          <el-form-item class="input" v-if="ruleForm.zongshu" label="总数" prop="zongshu">
+          <el-form-item class="input" label="数量" prop="zongshu">
               <el-input v-model="ruleForm.zongshu" 
-                placeholder="总数" readonly></el-input>
+                placeholder="数量" readonly></el-input>
           </el-form-item>
         </div>
       </el-col>
@@ -198,47 +154,35 @@ export default {
       ro:{
 	yuanxiaomingcheng : false,
 	leixing : false,
-	shuxue : false,
-	wuli : false,
-	huaxue : false,
-	shengwu : false,
-	xinxixue : false,
+	jiangxiangmingcheng : false,
 	zongshu : false,
       },
             ruleForm: {
-                	        yuanxiaomingcheng: '',
-	                        	        leixing: '',
-	                        	        shuxue: '',
-	                        	        wuli: '',
-	                        	        huaxue: '',
-	                        	        shengwu: '',
-	                        	        xinxixue: '',
-	                        	        zongshu: '',
-	                      },
+                        yuanxiaomingcheng: '',
+                                        leixing: '',
+                                        jiangxiangmingcheng: '',
+                                        zongshu: '',
+                      },
                                       leixingOptions: [],
+                                      competitionSuggests: [
+                                        { "value": "ACM-ICPC国际大学生程序设计竞赛" },
+                                        { "value": "蓝桥杯全国软件和信息技术大赛" },
+                                        { "value": "中国大学生计算机设计大赛" },
+                                        { "value": "全国大学生电子设计竞赛" },
+                                        { "value": "“挑战杯”全国大学生课外学术科技作品竞赛" },
+                                        { "value": "中国“互联网+”大学生创新创业大赛" },
+                                        { "value": "百度之星程序设计大赛" },
+                                        { "value": "华为ICT大赛" }
+                                      ],
                                                                                                         rules: {
                   yuanxiaomingcheng: [
                                     	                                                              ],
                   leixing: [
                                     	                                                              ],
-                  shuxue: [
-                                        { validator: validateIntNumber, trigger: 'blur' },
-                        	                                                              ],
-                  wuli: [
-                                        { validator: validateIntNumber, trigger: 'blur' },
-                        	                                                              ],
-                  huaxue: [
-                                        { validator: validateIntNumber, trigger: 'blur' },
-                        	                                                              ],
-                  shengwu: [
-                                        { validator: validateIntNumber, trigger: 'blur' },
-                        	                                                              ],
-                  xinxixue: [
-                                        { validator: validateIntNumber, trigger: 'blur' },
-                        	                                                              ],
                   zongshu: [
-                                        { validator: validateIntNumber, trigger: 'blur' },
-                        	                                                              ],
+                    { required: true, message: '数量不能为空', trigger: 'blur' },
+                    { validator: validateIntNumber, trigger: 'blur' },
+                                                                              ],
               }
     };
   },
@@ -280,29 +224,9 @@ export default {
 	    this.ro.leixing = true;
             continue;
           }
-	            	            if(o=='shuxue'){
-            this.ruleForm.shuxue = obj[o];
-	    this.ro.shuxue = true;
-            continue;
-          }
-	            	            if(o=='wuli'){
-            this.ruleForm.wuli = obj[o];
-	    this.ro.wuli = true;
-            continue;
-          }
-	            	            if(o=='huaxue'){
-            this.ruleForm.huaxue = obj[o];
-	    this.ro.huaxue = true;
-            continue;
-          }
-	            	            if(o=='shengwu'){
-            this.ruleForm.shengwu = obj[o];
-	    this.ro.shengwu = true;
-            continue;
-          }
-	            	            if(o=='xinxixue'){
-            this.ruleForm.xinxixue = obj[o];
-	    this.ro.xinxixue = true;
+	            	            if(o=='jiangxiangmingcheng'){
+            this.ruleForm.jiangxiangmingcheng = obj[o];
+	    this.ro.jiangxiangmingcheng = true;
             continue;
           }
 	            	            if(o=='zongshu'){
@@ -323,8 +247,19 @@ export default {
           this.$message.error(data.msg);
         }
       });
-                                                            this.leixingOptions = "一等奖,二等奖,三等奖".split(',')
+                                    this.leixingOptions = "特等奖,一等奖,二等奖,三等奖,优秀奖,金奖,银奖,铜奖".split(',')
                                                                                                                                         },
+         querySearchCompetition(queryString, cb) {
+            var competitionSuggests = this.competitionSuggests;
+            var results = queryString ? competitionSuggests.filter(this.createFilter(queryString)) : competitionSuggests;
+            // 调用 callback 返回建议列表的数据
+            cb(results);
+          },
+          createFilter(queryString) {
+            return (item) => {
+              return (item.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0);
+            };
+          },
                                                                         // 多级联动参数
                                                                                             info(id) {
       this.$http({
@@ -350,7 +285,7 @@ export default {
                               // ${column.compare}
                               // ${column.compare}
                               // ${column.compare}
-              this.ruleForm.zongshu = this.zongshu
+              // this.ruleForm.zongshu = this.zongshu
                                                                                                                                                                                     this.$refs["ruleForm"].validate(valid => {
         if (valid) {
           this.$http({

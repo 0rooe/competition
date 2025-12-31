@@ -59,6 +59,25 @@
             >{{ contents.btnAdAllFont == 1?'删除':'' }}</el-button>
 
 
+            <el-button
+              v-if="contents.btnAdAllIcon == 1 && contents.btnAdAllIconPosition == 1"
+              type="primary"
+              icon="el-icon-download"
+              style="background-color: #67C23A; border-color: #67C23A; color: #fff"
+              @click="downloadExcel()"
+            >{{ contents.btnAdAllFont == 1?'导出Excel':'' }}</el-button>
+            <el-button
+              v-if="contents.btnAdAllIcon == 1 && contents.btnAdAllIconPosition == 2"
+              type="primary"
+              style="background-color: #67C23A; border-color: #67C23A; color: #fff"
+              @click="downloadExcel()"
+            >{{ contents.btnAdAllFont == 1?'导出Excel':'' }}<i class="el-icon-download el-icon--right" /></el-button>
+            <el-button
+              v-if="contents.btnAdAllIcon == 0"
+              type="primary"
+              style="background-color: #67C23A; border-color: #67C23A; color: #fff"
+              @click="downloadExcel()"
+            >{{ contents.btnAdAllFont == 1?'导出Excel':'' }}</el-button>
                       </el-form-item>
         </el-row>
       </el-form>
@@ -345,6 +364,16 @@ export default {
           el.style.borderRadius = this.contents.btnAdAllBorderRadius
           el.style.backgroundColor = this.contents.btnAdAllWarnBgColor
         })
+        document.querySelectorAll('.form-content .ad .el-button--primary').forEach(el=>{
+          el.style.height = this.contents.btnAdAllHeight
+          el.style.color = 'rgba(255, 255, 255, 1)'
+          el.style.fontSize = this.contents.btnAdAllFontSize
+          el.style.borderWidth = this.contents.btnAdAllBorderWidth
+          el.style.borderStyle = this.contents.btnAdAllBorderStyle
+          el.style.borderColor = '#67C23A'
+          el.style.borderRadius = this.contents.btnAdAllBorderRadius
+          el.style.backgroundColor = '#67C23A'
+        })
       })
     },
     // 表格
@@ -503,6 +532,21 @@ export default {
         // 下载
     download(file){
       window.open(`${file}`)
+    },
+    downloadExcel() {
+      this.$http({
+        url: "saixiangxinxi/export",
+        method: "get",
+        responseType: "blob"
+      }).then(({ data }) => {
+        if (data) {
+            const link = document.createElement('a')
+            let blob = new Blob([data], {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+            link.href = URL.createObjectURL(blob);
+            link.download = "赛项信息列表.xlsx";
+            link.click();
+        }
+      });
     },
     // 删除
     deleteHandler(id) {

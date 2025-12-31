@@ -2,7 +2,8 @@
 SQLyog Ultimate v11.3 (64 bit)
 MySQL - 5.7.32-log : Database - springbootpx13e
 *********************************************************************
-*/
+*/
+
 
 /*!40101 SET NAMES utf8 */;
 
@@ -39,19 +40,15 @@ CREATE TABLE `jiangxiangtongji` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
   `addtime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `yuanxiaomingcheng` varchar(200) DEFAULT NULL COMMENT '院校名称',
-  `leixing` varchar(200) DEFAULT NULL COMMENT '类型',
-  `shuxue` int(11) DEFAULT NULL COMMENT '数学',
-  `wuli` int(11) DEFAULT NULL COMMENT '物理',
-  `huaxue` int(11) DEFAULT NULL COMMENT '化学',
-  `shengwu` int(11) DEFAULT NULL COMMENT '生物',
-  `xinxixue` int(11) DEFAULT NULL COMMENT '信息学',
+  `leixing` varchar(200) DEFAULT NULL COMMENT '奖项等级',
+  `jiangxiangmingcheng` varchar(200) DEFAULT NULL COMMENT '奖项名称',
   `zongshu` int(11) DEFAULT NULL COMMENT '总数',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=57 DEFAULT CHARSET=utf8 COMMENT='奖项统计';
 
 /*Data for the table `jiangxiangtongji` */
 
-insert  into `jiangxiangtongji`(`id`,`addtime`,`yuanxiaomingcheng`,`leixing`,`shuxue`,`wuli`,`huaxue`,`shengwu`,`xinxixue`,`zongshu`) values (51,'2021-03-26 17:35:51','院校名称1','一等奖',3,5,2,1,1,12),(52,'2021-03-26 17:35:51','院校名称2','一等奖',2,2,2,2,2,2),(53,'2021-03-26 17:35:51','院校名称3','一等奖',3,3,3,3,3,3),(54,'2021-03-26 17:35:51','院校名称4','一等奖',4,4,4,4,4,4),(55,'2021-03-26 17:35:51','院校名称5','一等奖',5,5,5,5,5,5),(56,'2021-03-26 17:35:51','院校名称6','一等奖',6,6,6,6,6,6);
+insert  into `jiangxiangtongji`(`id`,`addtime`,`yuanxiaomingcheng`,`leixing`,`jiangxiangmingcheng`, `zongshu`) values (51,'2021-03-26 17:35:51','院校名称1','一等奖', '大学生计算机设计大赛', 12),(52,'2021-03-26 17:35:51','院校名称2','一等奖','大学生计算机设计大赛', 2),(53,'2021-03-26 17:35:51','院校名称3','一等奖','大学生计算机设计大赛', 3),(54,'2021-03-26 17:35:51','院校名称4','一等奖','大学生计算机设计大赛', 4),(55,'2021-03-26 17:35:51','院校名称5','一等奖','大学生计算机设计大赛', 5),(56,'2021-03-26 17:35:51','院校名称6','一等奖','大学生计算机设计大赛', 6);
 
 /*Table structure for table `jiaoshi` */
 

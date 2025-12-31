@@ -70,6 +70,25 @@
               type="warning"
               @click="chartDialog()"
             >{{ contents.btnAdAllFont == 1?'统计报表':'' }}</el-button>
+            <el-button
+              v-if="contents.btnAdAllIcon == 1 && contents.btnAdAllIconPosition == 1"
+              type="primary"
+              icon="el-icon-download"
+              style="background-color: #67C23A; border-color: #67C23A; color: #fff"
+              @click="downloadExcel()"
+            >{{ contents.btnAdAllFont == 1?'导出Excel':'' }}</el-button>
+            <el-button
+              v-if="contents.btnAdAllIcon == 1 && contents.btnAdAllIconPosition == 2"
+              type="primary"
+              style="background-color: #67C23A; border-color: #67C23A; color: #fff"
+              @click="downloadExcel()"
+            >{{ contents.btnAdAllFont == 1?'导出Excel':'' }}<i class="el-icon-download el-icon--right" /></el-button>
+            <el-button
+              v-if="contents.btnAdAllIcon == 0"
+              type="primary"
+              style="background-color: #67C23A; border-color: #67C23A; color: #fff"
+              @click="downloadExcel()"
+            >{{ contents.btnAdAllFont == 1?'导出Excel':'' }}</el-button>
                       </el-form-item>
         </el-row>
       </el-form>
@@ -101,59 +120,27 @@
                        {{scope.row.yuanxiaomingcheng}}
                      </template>
                 </el-table-column>
-                	                	                                    <el-table-column  :sortable="contents.tableSortable" :align="contents.tableAlign"
+                                <el-table-column  :sortable="contents.tableSortable" :align="contents.tableAlign"
                     prop="leixing"
                     header-align="center"
-		    label="类型">
-		     <template slot-scope="scope">
+                    label="奖项等级">
+                     <template slot-scope="scope">
                        {{scope.row.leixing}}
                      </template>
                 </el-table-column>
-                	                	                                    <el-table-column  :sortable="contents.tableSortable" :align="contents.tableAlign"
-                    prop="shuxue"
+                <el-table-column  :sortable="contents.tableSortable" :align="contents.tableAlign"
+                    prop="jiangxiangmingcheng"
                     header-align="center"
-		    label="数学">
-		     <template slot-scope="scope">
-                       {{scope.row.shuxue}}
+                    label="比赛名称">
+                     <template slot-scope="scope">
+                       {{scope.row.jiangxiangmingcheng}}
                      </template>
                 </el-table-column>
-                	                	                                    <el-table-column  :sortable="contents.tableSortable" :align="contents.tableAlign"
-                    prop="wuli"
-                    header-align="center"
-		    label="物理">
-		     <template slot-scope="scope">
-                       {{scope.row.wuli}}
-                     </template>
-                </el-table-column>
-                	                	                                    <el-table-column  :sortable="contents.tableSortable" :align="contents.tableAlign"
-                    prop="huaxue"
-                    header-align="center"
-		    label="化学">
-		     <template slot-scope="scope">
-                       {{scope.row.huaxue}}
-                     </template>
-                </el-table-column>
-                	                	                                    <el-table-column  :sortable="contents.tableSortable" :align="contents.tableAlign"
-                    prop="shengwu"
-                    header-align="center"
-		    label="生物">
-		     <template slot-scope="scope">
-                       {{scope.row.shengwu}}
-                     </template>
-                </el-table-column>
-                	                	                                    <el-table-column  :sortable="contents.tableSortable" :align="contents.tableAlign"
-                    prop="xinxixue"
-                    header-align="center"
-		    label="信息学">
-		     <template slot-scope="scope">
-                       {{scope.row.xinxixue}}
-                     </template>
-                </el-table-column>
-                	                	                                    <el-table-column  :sortable="contents.tableSortable" :align="contents.tableAlign"
+                <el-table-column  :sortable="contents.tableSortable" :align="contents.tableAlign"
                     prop="zongshu"
                     header-align="center"
-		    label="总数">
-		     <template slot-scope="scope">
+                    label="数量">
+                     <template slot-scope="scope">
                        {{scope.row.zongshu}}
                      </template>
                 </el-table-column>
@@ -198,12 +185,12 @@
 
     
     
-        <el-dialog
+    <el-dialog
       title="统计报表"
       :visible.sync="chartVisiable"
       width="800">
-                                                                                                                        <div id="zongshuChart" style="width:100%;height:600px;"></div>
-                    <span slot="footer" class="dialog-footer">
+      <div id="zongshuChart" style="width:100%;height:600px;"></div>
+      <span slot="footer" class="dialog-footer">
         <el-button @click="chartDialog">返回</el-button>
       </span>
     </el-dialog>
@@ -346,6 +333,16 @@ export default {
           el.style.borderColor = this.contents.btnAdAllBorderColor
           el.style.borderRadius = this.contents.btnAdAllBorderRadius
           el.style.backgroundColor = this.contents.btnAdAllWarnBgColor
+        })
+        document.querySelectorAll('.form-content .ad .el-button--primary').forEach(el=>{
+          el.style.height = this.contents.btnAdAllHeight
+          el.style.color = 'rgba(255, 255, 255, 1)'
+          el.style.fontSize = this.contents.btnAdAllFontSize
+          el.style.borderWidth = this.contents.btnAdAllBorderWidth
+          el.style.borderStyle = this.contents.btnAdAllBorderStyle
+          el.style.borderColor = '#67C23A'
+          el.style.borderRadius = this.contents.btnAdAllBorderRadius
+          el.style.backgroundColor = '#67C23A'
         })
       })
     },
@@ -547,6 +544,21 @@ export default {
         // 下载
     download(file){
       window.open(`${file}`)
+    },
+    downloadExcel() {
+      this.$http({
+        url: "jiangxiangtongji/export",
+        method: "get",
+        responseType: "blob"
+      }).then(({ data }) => {
+        if (data) {
+            const link = document.createElement('a')
+            let blob = new Blob([data], {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+            link.href = URL.createObjectURL(blob);
+            link.download = "奖项统计列表.xlsx";
+            link.click();
+        }
+      });
     },
     // 删除
     deleteHandler(id) {
