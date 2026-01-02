@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.mapper.Wrapper;
 
-
 import com.entity.SaixiangbaomingEntity;
 import com.entity.view.SaixiangbaomingView;
 
@@ -217,14 +216,25 @@ public class SaixiangbaomingController {
                 map.put("baomingriqi", item.getBaomingriqi());
                 map.put("xuehao", item.getXuehao());
                 map.put("xingming", item.getXingming());
-                map.put("sfsh", item.getSfsh());
+                // Transform sfsh values
+                String sfsh = item.getSfsh();
+                if ("是".equals(sfsh)) {
+                    map.put("sfsh", "通过");
+                } else if ("否".equals(sfsh)) {
+                    map.put("sfsh", "未通过");
+                } else {
+                    map.put("sfsh", sfsh);
+                }
                 map.put("shhf", item.getShhf());
+                // Add ispay field
+                map.put("ispay", item.getIspay());
                 mapList.add(map);
             }
         }
-        String[] headers = { "赛项名称", "类型", "级别", "报名费用", "报名日期", "学号", "姓名", "是否审核", "审核回复" };
+        // Update headers and columns
+        String[] headers = { "赛项名称", "类型", "级别", "报名费用", "报名日期", "学号", "姓名", "审核状态", "审核回复", "是否支付" };
         String[] columns = { "saixiangmingcheng", "leixing", "jibie", "baomingfeiyong", "baomingriqi", "xuehao",
-                "xingming", "sfsh", "shhf" };
+                "xingming", "sfsh", "shhf", "ispay" };
         com.utils.ExcelUtils.export(response, mapList, headers, columns, "赛项报名列表");
     }
 
