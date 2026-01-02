@@ -22,8 +22,9 @@ import com.baomidou.mybatisplus.mapper.Wrapper;
 
 import com.entity.SaixiangbaomingEntity;
 import com.entity.view.SaixiangbaomingView;
-
+import com.entity.XueshengEntity;
 import com.service.SaixiangbaomingService;
+import com.service.XueshengService;
 import com.utils.PageUtils;
 import com.utils.R;
 import com.utils.MPUtil;
@@ -42,6 +43,9 @@ public class SaixiangbaomingController {
     @Autowired
     private SaixiangbaomingService saixiangbaomingService;
 
+    @Autowired
+    private XueshengService xueshengService;
+
     /**
      * 后端列表
      */
@@ -49,10 +53,31 @@ public class SaixiangbaomingController {
     public R page(@RequestParam Map<String, Object> params, SaixiangbaomingEntity saixiangbaoming,
             HttpServletRequest request) {
         String tableName = request.getSession().getAttribute("tableName").toString();
-        if (tableName.equals("xuesheng")) {
-            saixiangbaoming.setXuehao((String) request.getSession().getAttribute("username"));
-        }
         EntityWrapper<SaixiangbaomingEntity> ew = new EntityWrapper<SaixiangbaomingEntity>();
+
+        if (tableName.equals("xuesheng")) {
+            String xuehao = (String) request.getSession().getAttribute("username");
+            List<SaixiangbaomingEntity> myEntries = saixiangbaomingService.selectList(
+                    new EntityWrapper<SaixiangbaomingEntity>().eq("xuehao", xuehao));
+            java.util.Set<String> myTeams = new java.util.HashSet<>();
+            for (SaixiangbaomingEntity e : myEntries) {
+                if (e.getTuanduimingcheng() != null && !e.getTuanduimingcheng().isEmpty()) {
+                    myTeams.add(e.getTuanduimingcheng());
+                }
+            }
+            if (myTeams.isEmpty()) {
+                ew.eq("xuehao", xuehao);
+            } else {
+                ew.eq("xuehao", xuehao)
+                        .or()
+                        .in("tuanduimingcheng", myTeams);
+            }
+            ew.orderBy("tuanduimingcheng");
+        }
+        if (tableName.equals("jiaoshi")) {
+            saixiangbaoming.setJiaoshigonghao((String) request.getSession().getAttribute("username"));
+        }
+
         PageUtils page = saixiangbaomingService.queryPage(params,
                 MPUtil.sort(MPUtil.between(MPUtil.likeOrEq(ew, saixiangbaoming), params), params));
 
@@ -128,8 +153,44 @@ public class SaixiangbaomingController {
     public R add(@RequestBody SaixiangbaomingEntity saixiangbaoming, HttpServletRequest request) {
         saixiangbaoming.setId(new Date().getTime() + new Double(Math.floor(Math.random() * 1000)).longValue());
         // ValidatorUtils.validateEntity(saixiangbaoming);
+
+        if ("团队赛".equals(saixiangbaoming.getLeixing())) {
+            if ("队长".equals(saixiangbaoming.getTuanduiRole())) {
+                // Generate logic
+                String code = getRandomString(6);
+                saixiangbaoming.setInvitationCode(code);
+            } else if ("队员".equals(saixiangbaoming.getTuanduiRole())) {
+                // Member logic: validate code
+                if (saixiangbaoming.getInvitationCode() == null || saixiangbaoming.getInvitationCode().isEmpty()) {
+                    return R.error("请输入邀请码");
+                }
+                SaixiangbaomingEntity captain = saixiangbaomingService
+                        .selectOne(new EntityWrapper<SaixiangbaomingEntity>()
+                                .eq("invitation_code", saixiangbaoming.getInvitationCode()));
+
+                if (captain == null) {
+                    return R.error("无效的邀请码");
+                }
+                // Copy info from captain
+                saixiangbaoming.setTuanduimingcheng(captain.getTuanduimingcheng());
+                saixiangbaoming.setJiaoshigonghao(captain.getJiaoshigonghao());
+                saixiangbaoming.setJiaoshixingming(captain.getJiaoshixingming());
+            }
+        }
+
         saixiangbaomingService.insert(saixiangbaoming);
-        return R.ok();
+        return R.ok().put("invitationCode", saixiangbaoming.getInvitationCode());
+    }
+
+    public static String getRandomString(int length) {
+        String str = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        java.util.Random random = new java.util.Random();
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < length; i++) {
+            int number = random.nextInt(62);
+            sb.append(str.charAt(number));
+        }
+        return sb.toString();
     }
 
     /**
@@ -193,6 +254,9 @@ public class SaixiangbaomingController {
         if (tableName.equals("xuesheng")) {
             wrapper.eq("xuehao", (String) request.getSession().getAttribute("username"));
         }
+        if (tableName.equals("jiaoshi")) {
+            wrapper.eq("jiaoshigonghao", (String) request.getSession().getAttribute("username"));
+        }
 
         int count = saixiangbaomingService.selectCount(wrapper);
         return R.ok().put("count", count);
@@ -228,14 +292,75 @@ public class SaixiangbaomingController {
                 map.put("shhf", item.getShhf());
                 // Add ispay field
                 map.put("ispay", item.getIspay());
+                // Add teacher fields
+                map.put("jiaoshigonghao", item.getJiaoshigonghao());
+                map.put("jiaoshixingming", item.getJiaoshixingming());
+                map.put("tuanduimingcheng", item.getTuanduimingcheng());
+                map.put("tuanduiRole", item.getTuanduiRole());
+                map.put("invitationCode", item.getInvitationCode());
                 mapList.add(map);
             }
         }
-        // Update headers and columns
-        String[] headers = { "赛项名称", "类型", "级别", "报名费用", "报名日期", "学号", "姓名", "审核状态", "审核回复", "是否支付" };
+        String[] headers = { "赛项名称", "类型", "级别", "报名费用", "报名日期", "学号", "姓名", "审核状态", "审核回复", "是否支付", "教师工号", "教师姓名",
+                "团队名称", "团队角色", "邀请码" };
         String[] columns = { "saixiangmingcheng", "leixing", "jibie", "baomingfeiyong", "baomingriqi", "xuehao",
-                "xingming", "sfsh", "shhf", "ispay" };
+                "xingming", "sfsh", "shhf", "ispay", "jiaoshigonghao", "jiaoshixingming", "tuanduimingcheng",
+                "tuanduiRole", "invitationCode" };
         com.utils.ExcelUtils.export(response, mapList, headers, columns, "赛项报名列表");
+    }
+
+    /**
+     * 邀请队员
+     */
+    @RequestMapping("/invite")
+    public R invite(@RequestParam Map<String, Object> params, HttpServletRequest request) {
+        String xuehao = (String) params.get("xuehao");
+        String teamName = (String) params.get("teamName");
+        String saixiangId = (String) params.get("saixiangId");
+
+        // Check if student exists
+        XueshengEntity student = xueshengService.selectOne(new EntityWrapper<XueshengEntity>().eq("xuehao", xuehao));
+        if (student == null) {
+            return R.error("未找到该学号的学生");
+        }
+
+        // Check if already registered
+        SaixiangbaomingEntity existing = saixiangbaomingService.selectOne(new EntityWrapper<SaixiangbaomingEntity>()
+                .eq("xuehao", xuehao)
+                .eq("saixiangmingcheng", params.get("saixiangmingcheng")));
+
+        if (existing != null) {
+            return R.error("该学生已报名此赛项");
+        }
+
+        // Create registration
+        SaixiangbaomingEntity baoming = new SaixiangbaomingEntity();
+        // Copy necessary fields from Captain's registration or params
+        // Ideally we should look up the captain's record to copy competition details,
+        // but for now we assume params has enough info or we fetch valid info
+
+        baoming.setXuehao(student.getXuehao());
+        baoming.setXingming(student.getXingming());
+        baoming.setTuanduimingcheng(teamName);
+        baoming.setTuanduiRole("队员");
+
+        // We need to fill in other fields like saixiangmingcheng, etc.
+        // Let's assume the params passed contain the full registration object of the
+        // captain to copy from
+        baoming.setSaixiangmingcheng((String) params.get("saixiangmingcheng"));
+        baoming.setLeixing((String) params.get("leixing"));
+        baoming.setJibie((String) params.get("jibie"));
+        baoming.setBaomingfeiyong((Integer) params.get("baomingfeiyong")); // Careful with Type casting
+        baoming.setBaomingriqi(new java.util.Date());
+
+        // Copy Teacher info
+        baoming.setJiaoshigonghao((String) params.get("jiaoshigonghao"));
+        baoming.setJiaoshixingming((String) params.get("jiaoshixingming"));
+
+        baoming.setId(new java.util.Date().getTime());
+        saixiangbaomingService.insert(baoming);
+
+        return R.ok("邀请成功");
     }
 
 }

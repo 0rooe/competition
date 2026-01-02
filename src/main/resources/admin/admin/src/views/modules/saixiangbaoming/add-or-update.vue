@@ -98,7 +98,55 @@
           </el-form-item>
         </div>
       </el-col>
-                                                                                                                        </el-row>
+      <el-col :span="12">
+        <el-form-item class="select" v-if="type!='info'"  label="指导教师" prop="jiaoshigonghao">
+          <el-select v-model="ruleForm.jiaoshigonghao" placeholder="请选择指导教师" @change="jiaoshiChange">
+            <el-option
+                v-for="(item,index) in jiaoshiOptions"
+                :key="index"
+                :label="item.xingming"
+                :value="item.gonghao">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <div v-else>
+          <el-form-item class="input" label="指导教师" prop="jiaoshixingming">
+              <el-input v-model="ruleForm.jiaoshixingming" 
+                placeholder="指导教师" readonly></el-input>
+          </el-form-item>
+        </div>
+      </el-col>
+      <el-col :span="12">
+        <el-form-item class="input" v-if="type!='info'"  label="团队名称" prop="tuanduimingcheng">
+          <el-input v-model="ruleForm.tuanduimingcheng" 
+              placeholder="团队名称" clearable  :readonly="ro.tuanduimingcheng"></el-input>
+        </el-form-item>
+        <div v-else>
+          <el-form-item class="input" label="团队名称" prop="tuanduimingcheng">
+              <el-input v-model="ruleForm.tuanduimingcheng" 
+                placeholder="团队名称" readonly></el-input>
+          </el-form-item>
+        </div>
+      </el-col>
+      <el-col :span="12">
+        <el-form-item class="select" v-if="type!='info'"  label="团队角色" prop="tuandui_role">
+          <el-select v-model="ruleForm.tuandui_role" placeholder="请选择团队角色">
+            <el-option
+                v-for="(item,index) in tuanduiRoleOptions"
+                :key="index"
+                :label="item"
+                :value="item">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <div v-else>
+          <el-form-item class="input" label="团队角色" prop="tuandui_role">
+              <el-input v-model="ruleForm.tuandui_role" 
+                placeholder="团队角色" readonly></el-input>
+          </el-form-item>
+        </div>
+      </el-col>
+      </el-row>
                                                                                                                                                                                                                                                               <el-row>
             <el-col :span="24">
               <el-form-item v-if="type!='info'"  label="申报材料" prop="shenbaocailiao">
@@ -211,6 +259,8 @@ export default {
 	sfsh : false,
 	shhf : false,
 	ispay : false,
+    jiaoshigonghao: false,
+    jiaoshixingming: false,
       },
             ruleForm: {
                 	        saixiangmingcheng: '',
@@ -222,8 +272,12 @@ export default {
 	                        	        xuehao: '',
 	                        	        xingming: '',
 	                        	                        	        shhf: '',
+                                    jiaoshigonghao: '',
+                                    jiaoshixingming: '',
+                                    tuanduimingcheng: '',
+                                    tuandui_role: '',
 	                        	                      },
-                                                                                                                                                                      rules: {
+                                                                                                                                                                       rules: {
                   saixiangmingcheng: [
                                     	                                                              ],
                   leixing: [
@@ -247,7 +301,13 @@ export default {
                                     	                                                              ],
                   ispay: [
                                     	                                                              ],
-              }
+                  jiaoshigonghao: [],
+                  jiaoshixingming: [],
+                  tuanduimingcheng: [],
+                  tuandui_role: [],
+              },
+              jiaoshiOptions: [],
+              tuanduiRoleOptions: ['队长', '队员'],
     };
   },
   props: ["parent"],
@@ -348,6 +408,25 @@ export default {
           this.$message.error(data.msg);
         }
       });
+      this.$http({
+        url: `jiaoshi/list`,
+        method: "get",
+        params: {
+            page: 1,
+            limit: 100,
+        }
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.jiaoshiOptions = data.data.list;
+        }
+      });
+    },
+    // 下二随
+    jiaoshiChange(gonghao){
+        let obj = this.jiaoshiOptions.find(item => item.gonghao == gonghao);
+        if(obj){
+            this.ruleForm.jiaoshixingming = obj.xingming;
+        }
     },
         // 提交
     onSubmit() {

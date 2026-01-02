@@ -109,12 +109,17 @@ CREATE TABLE `saixiangbaoming` (
   `sfsh` varchar(200) DEFAULT '否' COMMENT '是否审核',
   `shhf` longtext COMMENT '审核回复',
   `ispay` varchar(200) DEFAULT '未支付' COMMENT '是否支付',
+  `jiaoshigonghao` varchar(200) DEFAULT NULL COMMENT '教师工号',
+  `jiaoshixingming` varchar(200) DEFAULT NULL COMMENT '教师姓名',
+  `tuanduimingcheng` varchar(200) DEFAULT NULL COMMENT '团队名称',
+  `tuandui_role` varchar(200) DEFAULT NULL COMMENT '团队角色',
+  `invitation_code` varchar(20) DEFAULT NULL COMMENT '邀请码',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1616751509990 DEFAULT CHARSET=utf8 COMMENT='赛项报名';
 
 /*Data for the table `saixiangbaoming` */
 
-insert  into `saixiangbaoming`(`id`,`addtime`,`saixiangmingcheng`,`leixing`,`jibie`,`baomingfeiyong`,`baomingriqi`,`shenbaocailiao`,`xuehao`,`xingming`,`sfsh`,`shhf`,`ispay`) values (1616751508361,'2021-03-26 17:38:27','赛项名称1','团队赛','初赛',1,'2021-03-26','<p>编辑器可以发布图片文字</p>','11','11','是','aEDA','已支付'),(1616751509989,'2021-03-26 17:38:29','赛项名称1','团队赛','初赛',1,'2021-03-26','<p>编辑器可以发布图片文字</p>','11','11','是','DasdA','已支付');
+insert  into `saixiangbaoming`(`id`,`addtime`,`saixiangmingcheng`,`leixing`,`jibie`,`baomingfeiyong`,`baomingriqi`,`shenbaocailiao`,`xuehao`,`xingming`,`sfsh`,`shhf`,`ispay`,`jiaoshigonghao`,`jiaoshixingming`,`tuanduimingcheng`,`tuandui_role`) values (1616751508361,'2021-03-26 17:38:27','赛项名称1','团队赛', '初赛',1,'2021-03-26','<p>编辑器可以发布图片文字</p>','11','11','是','aEDA','已支付',NULL,NULL,'荣耀战队','队长'),(1616751509989,'2021-03-26 17:38:29','赛项名称1','团队赛','初赛',1,'2021-03-26','<p>编辑器可以发布图片文字</p>','11','11','是','DasdA','已支付',NULL,NULL,'荣耀战队','队员');
 
 /*Table structure for table `saixiangxinxi` */
 

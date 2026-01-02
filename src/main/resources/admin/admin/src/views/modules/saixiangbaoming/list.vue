@@ -109,6 +109,9 @@
             v-if="isAuth('saixiangbaoming','查看')"
             :data="dataList"
             v-loading="dataListLoading"
+            row-key="id"
+            :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
+            default-expand-all
             @selection-change="selectionChangeHandler">
             <el-table-column  v-if="contents.tableSelection"
                 type="selection"
@@ -142,6 +145,22 @@
                      </template>
                 </el-table-column>
                 	                	                                    <el-table-column  :sortable="contents.tableSortable" :align="contents.tableAlign"
+                    prop="invitationCode"
+                    header-align="center"
+		    label="邀请码">
+		     <template slot-scope="scope">
+                       {{scope.row.invitationCode}}
+                     </template>
+                </el-table-column>
+                	                	                                    <el-table-column  :sortable="contents.tableSortable" :align="contents.tableAlign"
+                    prop="tuanduiRole"
+                    header-align="center"
+		    label="团队角色">
+		     <template slot-scope="scope">
+                       {{scope.row.tuanduiRole}}
+                     </template>
+                </el-table-column>
+                	                	                                    <el-table-column  :sortable="contents.tableSortable" :align="contents.tableAlign"
                     prop="baomingfeiyong"
                     header-align="center"
 		    label="报名费用">
@@ -171,6 +190,14 @@
 		    label="姓名">
 		     <template slot-scope="scope">
                        {{scope.row.xingming}}
+                     </template>
+                </el-table-column>
+                	                	                                    <el-table-column  :sortable="contents.tableSortable" :align="contents.tableAlign"
+                    prop="jiaoshixingming"
+                    header-align="center"
+		    label="指导教师">
+		     <template slot-scope="scope">
+                       {{scope.row.jiaoshixingming}}
                      </template>
                 </el-table-column>
                 	                	                                    	                	                                    	                	                                    <el-table-column
@@ -593,7 +620,51 @@ export default {
         params: params
       }).then(({ data }) => {
         if (data && data.code === 0) {
-          this.dataList = data.data.list;
+          // Grouping Logic for Teams
+          let rawList = data.data.list;
+          let finalData = [];
+          let processedIds = new Set();
+          let teams = {};
+
+          // 1. Organize teams
+          rawList.forEach(item => {
+              if (item.tuanduimingcheng) {
+                   let key = item.saixiangmingcheng + '_' + item.tuanduimingcheng;
+                   if (!teams[key]) teams[key] = [];
+                   teams[key].push(item);
+              }
+          });
+
+          // 2. Build Tree Structure
+          rawList.forEach(item => {
+              if (processedIds.has(item.id)) return;
+
+              if (!item.tuanduimingcheng) {
+                  // Individual
+                  finalData.push(item);
+                  processedIds.add(item.id);
+              } else {
+                  // Team
+                  let key = item.saixiangmingcheng + '_' + item.tuanduimingcheng;
+                  if (teams[key]) {
+                      let group = teams[key];
+                      // Find captain to be parent, default to first found if none
+                      let captain = group.find(m => m.tuanduiRole === '队长') || group[0];
+                      
+                      // Others are children
+                      let children = group.filter(m => m.id !== captain.id);
+                      if (children.length > 0) {
+                          captain.children = children;
+                      }
+                      
+                      finalData.push(captain);
+                      // Mark all team members as processed
+                      group.forEach(m => processedIds.add(m.id));
+                  }
+              }
+          });
+
+          this.dataList = finalData;
           this.totalPage = data.data.total;
         } else {
           this.dataList = [];

@@ -95,12 +95,15 @@
 
 <body>
 	<div id="app" v-cloak>
-		<div class="add-container">
+		<div class="add-container" :style="{display: formVisible ? 'block' : 'none'}" style="display: none;">
 			<div class="form-header">
 				<h2>赛项报名</h2>
 			</div>
 
 			<form class="layui-form" lay-filter="myForm">
+				<input type="hidden" name="tuanduiRole" v-model="detail.tuanduiRole">
+				<!-- ... existing form fields ... -->
+
 
 				<div class="layui-form-item">
 					<label class="layui-form-label">赛项名称</label>
@@ -158,6 +161,42 @@
 					</div>
 				</div>
 
+
+
+				<div class="layui-form-item" v-if="detail.leixing == '团队赛' && detail.tuanduiRole == '队长'">
+					<label class="layui-form-label">团队名称</label>
+					<div class="layui-input-block">
+						<input type="text" v-model="detail.tuanduimingcheng" name="tuanduimingcheng"
+							placeholder="请输入团队名称" class="layui-input">
+					</div>
+				</div>
+
+				<div class="layui-form-item" v-if="detail.leixing == '团队赛' && detail.tuanduiRole == '队员'">
+					<label class="layui-form-label">邀请码</label>
+					<div class="layui-input-block">
+						<input type="text" v-model="detail.invitationCode" name="invitationCode"
+							placeholder="请输入队长提供的邀请码" class="layui-input">
+					</div>
+				</div>
+
+				<div class="layui-form-item" v-if="detail.tuanduiRole != '队员'">
+					<label class="layui-form-label">指导教师</label>
+					<div class="layui-input-block">
+						<select name="jiaoshigonghao" id="jiaoshigonghao" lay-filter="jiaoshigonghao"
+							v-model="detail.jiaoshigonghao">
+							<option value="">请选择指导教师</option>
+							<option v-for="(item,index) in jiaoshiList" v-bind:key="index" :value="item.gonghao">{{
+								item.xingming }}</option>
+						</select>
+					</div>
+				</div>
+				<div class="layui-form-item" v-else>
+					<label class="layui-form-label">指导教师</label>
+					<div class="layui-input-block">
+						<input type="text" value="自动跟随队长" readonly class="layui-input readonly-input">
+					</div>
+				</div>
+
 				<div class="layui-form-item">
 					<label class="layui-form-label">备注/材料</label>
 					<div class="layui-input-block">
@@ -193,9 +232,19 @@
 					shenbaocailiao: '',
 					xuehao: '',
 					xingming: '',
+					jiaoshigonghao: '',
+					jiaoshixingming: '',
+					tuanduimingcheng: '',
+					tuanduiRole: '',
+					invitationCode: '',
 				},
+				jiaoshiList: [],
 				backupDetail: {}, // Add backup object
 				ro: {},
+				formVisible: false, // Control form visibility
+			},
+			updated: function () {
+				layui.form.render();
 			},
 			methods: {
 				jump(url) { jump(url) }
@@ -203,6 +252,7 @@
 		});
 
 		layui.use(['layer', 'element', 'http', 'jquery', 'form', 'laydate', 'tinymce', 'util'], function () {
+			// ... existing modules ...
 			var layer = layui.layer;
 			var http = layui.http;
 			var jquery = layui.jquery;
@@ -211,6 +261,7 @@
 			var tinymce = layui.tinymce;
 			var util = layui.util;
 
+			// ... date/tinymce init ...
 			// Date Picker
 			laydate.render({
 				elem: '#baomingriqi',
@@ -236,6 +287,17 @@
 				}
 			});
 
+			// Get Teachers
+			http.request('jiaoshi/list', 'get', {
+				page: 1,
+				limit: 100
+			}, function (res) {
+				vue.jiaoshiList = res.data.list;
+				vue.$nextTick(() => {
+					form.render('select');
+				});
+			});
+
 			// Get Cross Table Data (Competition Info)
 			if (http.getParam('corss')) {
 				var obj = JSON.parse(localStorage.getItem('crossObj'));
@@ -247,11 +309,26 @@
 				}
 				// Backup the initialized data (including cross data)
 				vue.backupDetail = JSON.parse(JSON.stringify(vue.detail));
+
+				// Trigger Team Check
+				setTimeout(function () {
+					checkTeamType();
+				}, 300);
+			} else {
+				// Even if not cross, check
+				setTimeout(function () {
+					checkTeamType();
+				}, 300);
 			}
 
 			// Submit
 			form.on('submit(*)', function (data) {
+				// ... submit logic ...
 				data = data.field;
+
+				// Force sync tuanduiRole from Vue to ensure it is sent correctly
+				// as hidden inputs sometimes have synchronization issues with Layui
+				data.tuanduiRole = vue.detail.tuanduiRole;
 
 				// Get TinyMCE content
 				var shenbaocailiao = tinymce.get('#shenbaocailiao').getContent();
@@ -260,19 +337,162 @@
 				// Add UserID (Critical Fix)
 				data.userid = localStorage.getItem('userid');
 
+				// Set Teacher Name
+				if (data.jiaoshigonghao) {
+					let tea = vue.jiaoshiList.find(t => t.gonghao == data.jiaoshigonghao);
+					if (tea) {
+						data.jiaoshixingming = tea.xingming;
+					}
+				}
+
 				http.requestJson('saixiangbaoming/add', 'post', data, function (res) {
-					layer.msg('报名成功！请前往个人后台查看', {
-						time: 2000,
-						icon: 6
-					}, function () {
-						// Redirect to my list or back
-						// window.location.href = '../saixiangbaoming/list.html'; // Or user center
-						back();
-					});
+					// Logic prioritized by Role to avoid ambiguity
+					if (vue.detail.tuanduiRole == '队长') {
+						// Captain: Show Invitation Code
+						layer.open({
+							type: 1, // Page layer
+							title: false,
+							closeBtn: 0,
+							area: '400px',
+							shade: 0.8,
+							resize: false,
+							id: 'LAY_invite_code', // ID
+							content: `
+                                <div style="background: #fff; border-radius: 4px; overflow: hidden; font-family: 'PingFang SC', 'Microsoft YaHei';">
+                                    <div style="background: #1E9FFF; padding: 20px; text-align: center;">
+                                        <h3 style="color: #fff; font-size: 18px; font-weight: 500; margin: 0;">团队创建成功</h3>
+                                    </div>
+                                    <div style="padding: 30px 20px; text-align: center;">
+                                         <p style="color: #666; font-size: 14px; margin-bottom: 15px;">您的团队邀请码为</p>
+                                         <div style="font-size: 32px; color: #1E9FFF; font-weight: bold; letter-spacing: 2px; margin-bottom: 20px;">
+                                             ${res.invitationCode}
+                                         </div>
+                                         <p style="color: #999; font-size: 12px; margin-bottom: 30px;">请将此码分享给队员以便加入</p>
+                                         <div style="display: flex; gap: 15px;">
+                                             <button class="layui-btn layui-btn-normal" style="flex: 1; height: 40px; line-height: 40px; border-radius: 4px;" id="btn-copy">复制并返回</button>
+                                         </div>
+                                    </div>
+                                </div>
+                            `,
+							success: function (layero, index) {
+								layui.jquery('#btn-copy').on('click', function () {
+									var input = document.createElement('input');
+									input.setAttribute('value', res.invitationCode);
+									document.body.appendChild(input);
+									input.select();
+									document.execCommand('copy');
+									document.body.removeChild(input);
+									layer.msg('复制成功', { time: 1000 });
+									layer.close(index);
+									back();
+								});
+							}
+						});
+					}
+					else if (vue.detail.tuanduiRole == '队员') {
+						// Member: Show Join Success Modal
+						layer.open({
+							type: 1,
+							title: false,
+							closeBtn: 0,
+							area: '400px',
+							shade: 0.8,
+							resize: false,
+							id: 'LAY_join_success',
+							content: `
+                                <div style="background: #fff; border-radius: 4px; overflow: hidden; font-family: 'PingFang SC', 'Microsoft YaHei';">
+                                    <div style="background: #5FB878; padding: 20px; text-align: center;">
+                                        <h3 style="color: #fff; font-size: 18px; font-weight: 500; margin: 0;">加入团队成功</h3>
+                                    </div>
+                                    <div style="padding: 30px 20px; text-align: center;">
+                                         <div style="margin-bottom: 20px;">
+                                            <i class="layui-icon layui-icon-ok-circle" style="font-size: 60px; color: #5FB878;"></i>
+                                         </div>
+                                         <p style="color: #666; font-size: 16px; margin-bottom: 30px;">您已成功加入团队</p>
+                                         <div style="display: flex; gap: 15px;">
+                                             <button class="layui-btn layui-btn-normal" style="flex: 1; height: 40px; line-height: 40px; border-radius: 4px; background-color: #5FB878;" id="btn-ok">确定并返回</button>
+                                         </div>
+                                    </div>
+                                </div>
+                            `,
+							success: function (layero, index) {
+								layui.jquery('#btn-ok').on('click', function () {
+									layer.close(index);
+									back();
+								});
+							}
+						});
+					}
+					else {
+						// Default: Individual
+						layer.msg('报名成功！请前往个人后台查看', {
+							time: 2000,
+							icon: 6
+						}, function () {
+							back();
+						});
+					}
 				});
 				return false;
 			});
 		});
+
+		// Helper to check team type and prompt
+		function checkTeamType() {
+			// Only show modal for Team Competition AND when role is not yet selected
+			if (vue.detail.leixing == '团队赛' && !vue.detail.tuanduiRole) {
+				layer.open({
+					type: 1,
+					title: false, // Close default title
+					closeBtn: 0,
+					area: '400px',
+					shade: 0.6,
+					id: 'LAY_team_modal',
+					resize: false,
+					content: `
+                        <div style="background: #fff; border-radius: 4px; overflow: hidden; font-family: 'PingFang SC', 'Microsoft YaHei';">
+                            <div style="background: #1E9FFF; padding: 20px; text-align: center;">
+                                <h3 style="color: #fff; font-size: 18px; font-weight: 500; margin: 0;">团队赛报名</h3>
+                            </div>
+                            <div style="padding: 30px 20px; text-align: center;">
+                                <p style="color: #666; font-size: 16px; margin-bottom: 30px;">
+                                    本赛项为团队赛事<br>请选择您的参赛身份
+                                </p>
+                                <div style="display: flex; flex-direction: row; gap: 15px;">
+                                    <button class="layui-btn layui-btn-normal" id="btn-captain" 
+                                        style="flex: 1; height: 44px; font-size: 14px; border-radius: 4px; background: #1E9FFF;">
+                                        创建团队 (队长)
+                                    </button>
+                                    <button class="layui-btn layui-btn-primary" id="btn-member" 
+                                        style="flex: 1; height: 44px; font-size: 14px; border-radius: 4px; border: 1px solid #1E9FFF; color: #1E9FFF;">
+                                        加入团队 (队员)
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `,
+					success: function (layero, index) {
+						// Bind events manually to avoid Layui btn callback limitations with custom html
+						layui.jquery('#btn-captain').on('click', function () {
+							vue.detail.tuanduiRole = '队长';
+							vue.formVisible = true;
+							layer.close(index);
+							layui.form.render();
+						});
+						layui.jquery('#btn-member').on('click', function () {
+							vue.detail.tuanduiRole = '队员';
+							vue.formVisible = true;
+							layer.close(index);
+							layui.form.render();
+						});
+					}
+				});
+			} else {
+				// Not a team competition or already selected, show form immediately
+				vue.formVisible = true;
+				layui.form.render(); // Ensure render
+			}
+		}
 	</script>
 </body>
 

@@ -59,7 +59,13 @@
             >{{ contents.btnAdAllFont == 1?'删除':'' }}</el-button>
 
 
-                      </el-form-item>
+                        <el-button
+              v-if="isAuth('xuesheng','查看')"
+              type="success"
+              icon="el-icon-download"
+              @click="downloadExport()"
+            >导出</el-button>
+          </el-form-item>
         </el-row>
       </el-form>
       <div class="table-content">
@@ -466,7 +472,11 @@ export default {
       });
     },
     // 查看评论
-        // 下载
+    // 导出
+    downloadExport() {
+      window.open(this.$base.url + 'xuesheng/export');
+    },
+    // 下载
     download(file){
       window.open(`${file}`)
     },

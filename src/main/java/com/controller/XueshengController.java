@@ -10,8 +10,10 @@ import java.util.Iterator;
 import java.util.Date;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import com.utils.ValidatorUtils;
+import com.utils.ExcelUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -35,12 +37,12 @@ import com.utils.MD5Util;
 import com.utils.MPUtil;
 import com.utils.CommonUtil;
 
-
 /**
  * 学生
  * 后端接口
- * @author 
- * @email 
+ * 
+ * @author
+ * @email
  * @date 2021-03-26 17:35:20
  */
 @RestController
@@ -48,125 +50,127 @@ import com.utils.CommonUtil;
 public class XueshengController {
     @Autowired
     private XueshengService xueshengService;
-    
-	@Autowired
-	private TokenService tokenService;
-	
-	/**
-	 * 登录
-	 */
-	@IgnoreAuth
-	@RequestMapping(value = "/login")
-	public R login(String username, String password, String captcha, HttpServletRequest request) {
-		XueshengEntity user = xueshengService.selectOne(new EntityWrapper<XueshengEntity>().eq("xuehao", username));
-		if(user==null || !user.getMima().equals(password)) {
-			return R.error("账号或密码不正确");
-		}
-		
-		String token = tokenService.generateToken(user.getId(), username,"xuesheng",  "学生" );
-		return R.ok().put("token", token);
-	}
-	
-	/**
+
+    @Autowired
+    private TokenService tokenService;
+
+    /**
+     * 登录
+     */
+    @IgnoreAuth
+    @RequestMapping(value = "/login")
+    public R login(String username, String password, String captcha, HttpServletRequest request) {
+        XueshengEntity user = xueshengService.selectOne(new EntityWrapper<XueshengEntity>().eq("xuehao", username));
+        if (user == null || !user.getMima().equals(password)) {
+            return R.error("账号或密码不正确");
+        }
+
+        String token = tokenService.generateToken(user.getId(), username, "xuesheng", "学生");
+        return R.ok().put("token", token);
+    }
+
+    /**
      * 注册
      */
-	@IgnoreAuth
+    @IgnoreAuth
     @RequestMapping("/register")
-    public R register(@RequestBody XueshengEntity xuesheng){
-    	//ValidatorUtils.validateEntity(xuesheng);
-    	XueshengEntity user = xueshengService.selectOne(new EntityWrapper<XueshengEntity>().eq("xuehao", xuesheng.getXuehao()));
-		if(user!=null) {
-			return R.error("注册用户已存在");
-		}
-		Long uId = new Date().getTime();
-		xuesheng.setId(uId);
+    public R register(@RequestBody XueshengEntity xuesheng) {
+        // ValidatorUtils.validateEntity(xuesheng);
+        XueshengEntity user = xueshengService
+                .selectOne(new EntityWrapper<XueshengEntity>().eq("xuehao", xuesheng.getXuehao()));
+        if (user != null) {
+            return R.error("注册用户已存在");
+        }
+        Long uId = new Date().getTime();
+        xuesheng.setId(uId);
         xueshengService.insert(xuesheng);
         return R.ok();
     }
-	
-	/**
-	 * 退出
-	 */
-	@RequestMapping("/logout")
-	public R logout(HttpServletRequest request) {
-		request.getSession().invalidate();
-		return R.ok("退出成功");
-	}
-	
-	/**
+
+    /**
+     * 退出
+     */
+    @RequestMapping("/logout")
+    public R logout(HttpServletRequest request) {
+        request.getSession().invalidate();
+        return R.ok("退出成功");
+    }
+
+    /**
      * 获取用户的session用户信息
      */
     @RequestMapping("/session")
-    public R getCurrUser(HttpServletRequest request){
-    	Long id = (Long)request.getSession().getAttribute("userId");
+    public R getCurrUser(HttpServletRequest request) {
+        Long id = (Long) request.getSession().getAttribute("userId");
         XueshengEntity user = xueshengService.selectById(id);
         return R.ok().put("data", user);
     }
-    
+
     /**
      * 密码重置
      */
     @IgnoreAuth
-	@RequestMapping(value = "/resetPass")
-    public R resetPass(String username, HttpServletRequest request){
-    	XueshengEntity user = xueshengService.selectOne(new EntityWrapper<XueshengEntity>().eq("xuehao", username));
-    	if(user==null) {
-    		return R.error("账号不存在");
-    	}
+    @RequestMapping(value = "/resetPass")
+    public R resetPass(String username, HttpServletRequest request) {
+        XueshengEntity user = xueshengService.selectOne(new EntityWrapper<XueshengEntity>().eq("xuehao", username));
+        if (user == null) {
+            return R.error("账号不存在");
+        }
         user.setMima("123456");
         xueshengService.updateById(user);
         return R.ok("密码已重置为：123456");
     }
 
-
     /**
      * 后端列表
      */
     @RequestMapping("/page")
-    public R page(@RequestParam Map<String, Object> params,XueshengEntity xuesheng,
-		HttpServletRequest request){
+    public R page(@RequestParam Map<String, Object> params, XueshengEntity xuesheng,
+            HttpServletRequest request) {
         EntityWrapper<XueshengEntity> ew = new EntityWrapper<XueshengEntity>();
-		PageUtils page = xueshengService.queryPage(params, MPUtil.sort(MPUtil.between(MPUtil.likeOrEq(ew, xuesheng), params), params));
+        PageUtils page = xueshengService.queryPage(params,
+                MPUtil.sort(MPUtil.between(MPUtil.likeOrEq(ew, xuesheng), params), params));
 
         return R.ok().put("data", page);
     }
-    
+
     /**
      * 前端列表
      */
     @RequestMapping("/list")
-    public R list(@RequestParam Map<String, Object> params,XueshengEntity xuesheng, HttpServletRequest request){
+    public R list(@RequestParam Map<String, Object> params, XueshengEntity xuesheng, HttpServletRequest request) {
         EntityWrapper<XueshengEntity> ew = new EntityWrapper<XueshengEntity>();
-		PageUtils page = xueshengService.queryPage(params, MPUtil.sort(MPUtil.between(MPUtil.likeOrEq(ew, xuesheng), params), params));
+        PageUtils page = xueshengService.queryPage(params,
+                MPUtil.sort(MPUtil.between(MPUtil.likeOrEq(ew, xuesheng), params), params));
         return R.ok().put("data", page);
     }
 
-	/**
+    /**
      * 列表
      */
     @RequestMapping("/lists")
-    public R list( XueshengEntity xuesheng){
-       	EntityWrapper<XueshengEntity> ew = new EntityWrapper<XueshengEntity>();
-      	ew.allEq(MPUtil.allEQMapPre( xuesheng, "xuesheng")); 
+    public R list(XueshengEntity xuesheng) {
+        EntityWrapper<XueshengEntity> ew = new EntityWrapper<XueshengEntity>();
+        ew.allEq(MPUtil.allEQMapPre(xuesheng, "xuesheng"));
         return R.ok().put("data", xueshengService.selectListView(ew));
     }
 
-	 /**
+    /**
      * 查询
      */
     @RequestMapping("/query")
-    public R query(XueshengEntity xuesheng){
-        EntityWrapper< XueshengEntity> ew = new EntityWrapper< XueshengEntity>();
- 		ew.allEq(MPUtil.allEQMapPre( xuesheng, "xuesheng")); 
-		XueshengView xueshengView =  xueshengService.selectView(ew);
-		return R.ok("查询学生成功").put("data", xueshengView);
+    public R query(XueshengEntity xuesheng) {
+        EntityWrapper<XueshengEntity> ew = new EntityWrapper<XueshengEntity>();
+        ew.allEq(MPUtil.allEQMapPre(xuesheng, "xuesheng"));
+        XueshengView xueshengView = xueshengService.selectView(ew);
+        return R.ok("查询学生成功").put("data", xueshengView);
     }
-	
+
     /**
      * 后端详情
      */
     @RequestMapping("/info/{id}")
-    public R info(@PathVariable("id") Long id){
+    public R info(@PathVariable("id") Long id) {
         XueshengEntity xuesheng = xueshengService.selectById(id);
         return R.ok().put("data", xuesheng);
     }
@@ -175,42 +179,41 @@ public class XueshengController {
      * 前端详情
      */
     @RequestMapping("/detail/{id}")
-    public R detail(@PathVariable("id") Long id){
+    public R detail(@PathVariable("id") Long id) {
         XueshengEntity xuesheng = xueshengService.selectById(id);
         return R.ok().put("data", xuesheng);
     }
-    
-
-
 
     /**
      * 后端保存
      */
     @RequestMapping("/save")
-    public R save(@RequestBody XueshengEntity xuesheng, HttpServletRequest request){
-    	xuesheng.setId(new Date().getTime()+new Double(Math.floor(Math.random()*1000)).longValue());
-    	//ValidatorUtils.validateEntity(xuesheng);
-    	XueshengEntity user = xueshengService.selectOne(new EntityWrapper<XueshengEntity>().eq("xuehao", xuesheng.getXuehao()));
-		if(user!=null) {
-			return R.error("用户已存在");
-		}
-		xuesheng.setId(new Date().getTime());
+    public R save(@RequestBody XueshengEntity xuesheng, HttpServletRequest request) {
+        xuesheng.setId(new Date().getTime() + new Double(Math.floor(Math.random() * 1000)).longValue());
+        // ValidatorUtils.validateEntity(xuesheng);
+        XueshengEntity user = xueshengService
+                .selectOne(new EntityWrapper<XueshengEntity>().eq("xuehao", xuesheng.getXuehao()));
+        if (user != null) {
+            return R.error("用户已存在");
+        }
+        xuesheng.setId(new Date().getTime());
         xueshengService.insert(xuesheng);
         return R.ok();
     }
-    
+
     /**
      * 前端保存
      */
     @RequestMapping("/add")
-    public R add(@RequestBody XueshengEntity xuesheng, HttpServletRequest request){
-    	xuesheng.setId(new Date().getTime()+new Double(Math.floor(Math.random()*1000)).longValue());
-    	//ValidatorUtils.validateEntity(xuesheng);
-    	XueshengEntity user = xueshengService.selectOne(new EntityWrapper<XueshengEntity>().eq("xuehao", xuesheng.getXuehao()));
-		if(user!=null) {
-			return R.error("用户已存在");
-		}
-		xuesheng.setId(new Date().getTime());
+    public R add(@RequestBody XueshengEntity xuesheng, HttpServletRequest request) {
+        xuesheng.setId(new Date().getTime() + new Double(Math.floor(Math.random() * 1000)).longValue());
+        // ValidatorUtils.validateEntity(xuesheng);
+        XueshengEntity user = xueshengService
+                .selectOne(new EntityWrapper<XueshengEntity>().eq("xuehao", xuesheng.getXuehao()));
+        if (user != null) {
+            return R.error("用户已存在");
+        }
+        xuesheng.setId(new Date().getTime());
         xueshengService.insert(xuesheng);
         return R.ok();
     }
@@ -219,65 +222,85 @@ public class XueshengController {
      * 修改
      */
     @RequestMapping("/update")
-    public R update(@RequestBody XueshengEntity xuesheng, HttpServletRequest request){
-        //ValidatorUtils.validateEntity(xuesheng);
-        xueshengService.updateById(xuesheng);//全部更新
+    public R update(@RequestBody XueshengEntity xuesheng, HttpServletRequest request) {
+        // ValidatorUtils.validateEntity(xuesheng);
+        xueshengService.updateById(xuesheng);// 全部更新
         return R.ok();
     }
-    
 
     /**
      * 删除
      */
     @RequestMapping("/delete")
-    public R delete(@RequestBody Long[] ids){
+    public R delete(@RequestBody Long[] ids) {
         xueshengService.deleteBatchIds(Arrays.asList(ids));
         return R.ok();
     }
-    
+
     /**
      * 提醒接口
      */
-	@RequestMapping("/remind/{columnName}/{type}")
-	public R remindCount(@PathVariable("columnName") String columnName, HttpServletRequest request, 
-						 @PathVariable("type") String type,@RequestParam Map<String, Object> map) {
-		map.put("column", columnName);
-		map.put("type", type);
-		
-		if(type.equals("2")) {
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-			Calendar c = Calendar.getInstance();
-			Date remindStartDate = null;
-			Date remindEndDate = null;
-			if(map.get("remindstart")!=null) {
-				Integer remindStart = Integer.parseInt(map.get("remindstart").toString());
-				c.setTime(new Date()); 
-				c.add(Calendar.DAY_OF_MONTH,remindStart);
-				remindStartDate = c.getTime();
-				map.put("remindstart", sdf.format(remindStartDate));
-			}
-			if(map.get("remindend")!=null) {
-				Integer remindEnd = Integer.parseInt(map.get("remindend").toString());
-				c.setTime(new Date());
-				c.add(Calendar.DAY_OF_MONTH,remindEnd);
-				remindEndDate = c.getTime();
-				map.put("remindend", sdf.format(remindEndDate));
-			}
-		}
-		
-		Wrapper<XueshengEntity> wrapper = new EntityWrapper<XueshengEntity>();
-		if(map.get("remindstart")!=null) {
-			wrapper.ge(columnName, map.get("remindstart"));
-		}
-		if(map.get("remindend")!=null) {
-			wrapper.le(columnName, map.get("remindend"));
-		}
+    @RequestMapping("/remind/{columnName}/{type}")
+    public R remindCount(@PathVariable("columnName") String columnName, HttpServletRequest request,
+            @PathVariable("type") String type, @RequestParam Map<String, Object> map) {
+        map.put("column", columnName);
+        map.put("type", type);
 
+        if (type.equals("2")) {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            Calendar c = Calendar.getInstance();
+            Date remindStartDate = null;
+            Date remindEndDate = null;
+            if (map.get("remindstart") != null) {
+                Integer remindStart = Integer.parseInt(map.get("remindstart").toString());
+                c.setTime(new Date());
+                c.add(Calendar.DAY_OF_MONTH, remindStart);
+                remindStartDate = c.getTime();
+                map.put("remindstart", sdf.format(remindStartDate));
+            }
+            if (map.get("remindend") != null) {
+                Integer remindEnd = Integer.parseInt(map.get("remindend").toString());
+                c.setTime(new Date());
+                c.add(Calendar.DAY_OF_MONTH, remindEnd);
+                remindEndDate = c.getTime();
+                map.put("remindend", sdf.format(remindEndDate));
+            }
+        }
 
-		int count = xueshengService.selectCount(wrapper);
-		return R.ok().put("count", count);
-	}
-	
+        Wrapper<XueshengEntity> wrapper = new EntityWrapper<XueshengEntity>();
+        if (map.get("remindstart") != null) {
+            wrapper.ge(columnName, map.get("remindstart"));
+        }
+        if (map.get("remindend") != null) {
+            wrapper.le(columnName, map.get("remindend"));
+        }
 
+        int count = xueshengService.selectCount(wrapper);
+        return R.ok().put("count", count);
+    }
 
+    /**
+     * 导出
+     */
+    @RequestMapping("/export")
+    public void export(HttpServletResponse response) throws java.io.IOException {
+        List<XueshengEntity> list = xueshengService.selectList(new EntityWrapper<XueshengEntity>());
+        List<Map<String, Object>> mapList = new ArrayList<>();
+        if (list != null) {
+            for (XueshengEntity item : list) {
+                Map<String, Object> map = new HashMap<>();
+                map.put("xuehao", item.getXuehao());
+                map.put("xingming", item.getXingming());
+                map.put("xingbie", item.getXingbie());
+                map.put("shouji", item.getShouji());
+                map.put("youxiang", item.getYouxiang());
+                map.put("shenfenzheng", item.getShenfenzheng());
+                mapList.add(map);
+            }
+        }
+        ExcelUtils.export(response, mapList,
+                new String[] { "学号", "姓名", "性别", "手机", "邮箱", "身份证" },
+                new String[] { "xuehao", "xingming", "xingbie", "shouji", "youxiang", "shenfenzheng" },
+                "学生列表");
+    }
 }
