@@ -61,10 +61,11 @@
 
                         <el-button
               v-if="isAuth('xuesheng','查看')"
-              type="success"
+              type="primary"
               icon="el-icon-download"
-              @click="downloadExport()"
-            >导出</el-button>
+              style="background-color: #67C23A; border-color: #67C23A; color: #fff"
+              @click="downloadExcel()"
+            >导出Excel</el-button>
           </el-form-item>
         </el-row>
       </el-form>
@@ -473,8 +474,20 @@ export default {
     },
     // 查看评论
     // 导出
-    downloadExport() {
-      window.open(this.$base.url + 'xuesheng/export');
+    downloadExcel() {
+      this.$http({
+        url: "xuesheng/export",
+        method: "get",
+        responseType: "blob"
+      }).then(({ data }) => {
+        if (data) {
+            const link = document.createElement('a')
+            let blob = new Blob([data], {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+            link.href = URL.createObjectURL(blob);
+            link.download = "学生列表.xlsx";
+            link.click();
+        }
+      });
     },
     // 下载
     download(file){
