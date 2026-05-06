@@ -55,6 +55,6 @@ siliconflow:
   api:
     base-url: https://api.siliconflow.cn/v1
     key: sk-qgtxqyjehqnwuxzunzwajbixphbfhzchpjsarnsjpruigqbp
-    model: Qwen/Qwen2-VL-72B-Instruct
+    model: Qwen/Qwen3-VL-32B-Instruct
     timeout: 60000
     max-tokens: 2000
