@@ -47,8 +47,7 @@ var indexNav = [
         url: './pages/news/list.html'
     },
 ]
-
-var adminurl = "http://localhost:8080/springbootpx13e/admin/index.html";
+var adminurl = window.location.protocol + "//" + window.location.host + "/springbootpx13e/admin/index.html";
 
 var cartFlag = false
 
