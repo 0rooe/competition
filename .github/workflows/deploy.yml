@@ -44,3 +44,20 @@ jobs:
           push: true
           tags: ghcr.io/${{ github.repository }}:latest
           platforms: linux/amd64
+
+      - name: Deploy to Server
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SERVER_HOST }}      # 你的服务器公网 IP
+          username: ${{ secrets.SERVER_USER }}  # 你的服务器登录用户名 (通常是 root)
+          password: ${{ secrets.SERVER_PASSWORD }}   # 你的服务器密码 (如果用密钥就填 key)
+          script: |
+            cd /opt/competition
+            # 登录 GHCR 仓库 (如果你的仓库是私有的需要登录，公开的话可以省略)
+            echo ${{ secrets.HELLO_GITHUB_ACTION_SECRET }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+            # 拉取最新镜像
+            docker pull ghcr.io/${{ github.repository }}:latest
+            # 重新启动容器
+            docker-compose up -d
+            # 清理掉旧的废弃镜像，防止把服务器硬盘撑爆
+            docker image prune -f
