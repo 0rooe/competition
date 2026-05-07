@@ -57,7 +57,7 @@ jobs:
             echo ${{ secrets.HELLO_GITHUB_ACTION_SECRET }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             # 拉取最新镜像
             docker pull ghcr.io/${{ github.repository }}:latest
-            # 重新启动容器
-            docker-compose up -d
-            # 清理掉旧的废弃镜像，防止把服务器硬盘撑爆
-            docker image prune -f
+            # 重新启动容器 (使用新版 docker compose 命令)
+            docker compose up -d
+            # 清理掉旧的废弃镜像，加 || true 防止 Docker 自身的已知 bug 导致报错中断
+            docker image prune -f || true
